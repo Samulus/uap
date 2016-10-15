@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>uap: About</title>
+    <link rel="stylesheet" href="../css/font-awesome-4.6.3/css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+<div id="logo">
+    <i id="logoIconColor" class="fa fa-music fa-fw"></i> uap
+</div>
+<br>
+
+<div class="nav_buttons">
+    <a href="index.html" class="button violet"><i class="fa fa-home fa-fw"></i> Home </a>
+    <a href="about.html" class="button orange"><i class="fa fa-info-circle fa-fw"></i> About </a>
+    <a href="specs.html" class="button yellow"><i class="fa fa-book fa-fw"></i> Specs </a>
+    <a href="team.html" class="button cyan"><i class="fa fa-users fa-fw"></i>Team </a>
+    <a href="gallery.html" class="button blue"><i class="fa fa-camera fa-fw"></i>Gallery</a>
+</div>
+
+<h2>About uap:</h2>
+
+<p>
+    uap is web based media player that allows you to stream music from your computer to any computer running
+    a modern web browser. It's a work in progress at the moment but we are excited to release
+    it this December.
+</p>
+
+<h2>Usage:</h2>
+<p>
+    Simply launch the main uap.py file and connect to http://127.0.0.1:8080 in your
+    web browser, the first time you launch the program you will be greeted with a configuration
+    page. Otherwise you're all set and can start listening to your music anywhere.
+</p>
+
+<h2>Technologies used:</h2>
+<p>
+    uap makes use of several excellent open source libraries to make music streaming possible including:
+    <h4>Backend</h4>
+    <ul>
+        <li>bottle.py as a portable webserver / framework</li>
+        <li>SQLite3 for serializing music library information offline / quick lookups </li>
+        <li>pytaglib / Taglib for collecting metadata from music files</li>
+    </ul>
+
+    <h4>Frontend</h4>
+    <ul>
+        <li>(undecided css framework) for creating a pretty and responsive user interface</li>
+        <li>(undecided js framework, may not need one) for communicating with the backend and ease of client design</li>
+    </ul>
+</p>
+
+</body>
+
+</html>
