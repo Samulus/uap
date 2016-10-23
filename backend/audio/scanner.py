@@ -14,7 +14,7 @@ from os import walk
 
 # unittest
 from tempfile import mkdtemp
-from os.path import join
+from os.path import join, isabs
 from os import remove, rmdir
 from unittest import TestCase
 
@@ -27,6 +27,8 @@ except ImportError:
 
 
 def get_audiofile_list(directory_path: str) -> Tuple[str]:
+    if (not isabs(directory_path)):
+        raise ValueError
     results = []
     for dirName, _, fileList in walk(directory_path):
         for filepath in fileList:
@@ -47,13 +49,18 @@ def get_audiofile_list(directory_path: str) -> Tuple[str]:
 
 
 class LibraryScannerTest(TestCase):
-    def setUp(self):
-        self.tmp_folder = mkdtemp()
-        self.tmp_filename = "__uap_libraryscannertest"
-        self.test_extensions = [".odt", ".pdf", ".zip", ".virus", ""]
-        self.test_extensions.extend(list(VALID_MEDIA_EXTENSIONS))
-        for ext in self.test_extensions:
-            with open(join(self.tmp_folder, self.tmp_filename + ext.upper()), "w") as tmp_file:
+    tmp_folder = None
+    test_extensions = None
+    tmp_filename = None
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tmp_folder = mkdtemp()
+        cls.tmp_filename = "__uap_libraryscannertest"
+        cls.test_extensions = [".odt", ".pdf", ".zip", ".virus", ""]
+        cls.test_extensions.extend(list(VALID_MEDIA_EXTENSIONS))
+        for ext in cls.test_extensions:
+            with open(join(cls.tmp_folder, cls.tmp_filename + ext.upper()), "w") as tmp_file:
                 tmp_file.close()
 
     def test_find_suspected_audio_files(self):
@@ -61,10 +68,15 @@ class LibraryScannerTest(TestCase):
         for suspect in suspected_media_files:
             assert suspect.lower().endswith(VALID_MEDIA_EXTENSIONS)
 
-    def tearDown(self):
-        for ext in self.test_extensions:
-            remove(join(self.tmp_folder, self.tmp_filename + ext.upper()))
-        rmdir(self.tmp_folder)
+    def test_fails_on_relative_path(self):
+        with self.assertRaises(ValueError) as _:
+            get_audiofile_list(".")
+
+    @classmethod
+    def tearDownClass(cls):
+        for ext in cls.test_extensions:
+            remove(join(cls.tmp_folder, cls.tmp_filename + ext.upper()))
+        rmdir(cls.tmp_folder)
 
 
 if __name__ == '__main__':
