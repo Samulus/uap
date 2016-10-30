@@ -3,12 +3,17 @@
     taglist.py
     Author: Samuel Vargas
     Date: 10/29/2016
+
+    TODO: taglib.File(file_path).tag.items() is extremely slow,
+    it takes about 10-15 seconds on my 26GB library. We should
+    either accept this and cache the database or write a faster
+    solution loading all of the DESIRED_TAGS from the music
+    library.
 """
 
 import taglib
-from typing import List, Tuple
-from os import walk
-from os.path import isabs, join
+import util
+from typing import List
 
 
 class TagList:
@@ -18,12 +23,16 @@ class TagList:
     def __init__(self, audio_directory: str, supported_ext=SUPPORTED_EXT, desired_tags=DESIRED_TAGS):
         self.tags = []
 
-        for file_path in self.__get_audio_files(audio_directory, supported_ext):
+        for file_path in util.get_audio_files(audio_directory, supported_ext):
             self.tags.append({})
             for tag_type, tag_value in taglib.File(file_path).tags.items():
                 for desired in desired_tags:
                     if tag_type.lower() == desired:
                         self.tags[-1][tag_type.lower()] = tag_value
+                self.tags[-1]["filepath"] = file_path
+
+    def get_tags(self):
+        return self.tags
 
     def search(self, artist=None, album=None, title=None) -> List[str]:
         results = []
@@ -45,15 +54,6 @@ class TagList:
                 results.append(tag)
         return results
 
-    @staticmethod
-    def __get_audio_files(audio_directory: str, supported_ext: Tuple) -> List[str]:
-        audio_files = []
 
-        if not isabs(audio_directory):
-            raise ValueError("'{0}' is not an absolute path to an audio_directory".format(audio_directory))
-
-        for dir_name, _, file_list in walk(audio_directory):
-            for file_path in file_list:
-                if file_path.lower().endswith(supported_ext):
-                    audio_files.append(join(dir_name, file_path))
-        return audio_files
+if __name__ == '__main__':
+    print(TagList("/home/sam/music").search())
