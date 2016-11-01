@@ -45,7 +45,7 @@ web client when I finish.
 
 * Client
     * ???
-    * ???
+    * Cody
 
 * Audio Player
     * ???
