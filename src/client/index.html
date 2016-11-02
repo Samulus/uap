@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:v-on="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>uap</title>
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/vital.min.css">
+    <link rel="stylesheet" href="css/vital.min.map">
+</head>
+<body>
+
+    <!--
+        Templates
+    -->
+
+    <template id="library-updater">
+        <a class="btn round no-outline" v-on:click="demo()">Refresh Library</a>
+    </template>
+
+    <template id="nav-component">
+        <div class="autogrid tabs-block">
+            <div class="col"><router-link class="col" to='/queue'   exact>Queue</router-link></div>
+            <div class="col"><router-link class="col" to='/artists' exact>Artists</router-link></div>
+            <div class="col"><router-link class="col" to='/albums'  exact>Albums</router-link></div>
+            <div class="col"><router-link class="col" to='/genres'  exact>Genres</router-link></div>
+            <div class="col"><library-updater></library-updater></div>
+        </div>
+    </template>
+
+    <template id="song-queue">
+        <span class="load large"></span>
+    </template>
+
+
+    <template id="artists-view">
+        <h1>Library</h1>
+    </template>
+
+    <!--
+        Application
+    -->
+
+    <div id="app">
+        <nav-component></nav-component>
+        <router-view></router-view>
+    </div>
+
+    <script src="js/lib/vue.js"></script>
+    <script src="js/lib/vue-router.min.js"></script>
+    <script src="js/lib/vue-resource.min.js"></script>
+    <script>
+        Vue.config.devtools = true
+    </script>
+
+    <script src="js/component.js"></script>
+    <script src="js/client.js"></script>
+
+</body>
+</html>

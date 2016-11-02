@@ -1,0 +1,15 @@
+body {
+    padding: 2.5em;
+    margin-bottom: 2em;
+    width: 100%;
+}
+
+div {
+    padding-bottom: 0.3em;
+}
+
+select {
+    width: 100%;
+    margin-bottom: 1.5em;
+    overflow-y:scroll;
+}
