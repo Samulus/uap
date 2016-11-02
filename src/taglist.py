@@ -12,16 +12,21 @@
 """
 
 import taglib
-import util
+from src import util
 from typing import List
+import json
 
 
 class TagList:
     SUPPORTED_EXT = (".mp3", ".ogg", ".flac")
     DESIRED_TAGS = ("title", "artist", "album", "album artist", "year", "tracknumber", "genre")
 
-    def __init__(self, audio_directory: str, supported_ext=SUPPORTED_EXT, desired_tags=DESIRED_TAGS):
+    def __init__(self, audio_directory="", supported_ext=SUPPORTED_EXT, desired_tags=DESIRED_TAGS):
+
         self.tags = []
+
+        if audio_directory is None:
+            return
 
         for file_path in util.get_audio_files(audio_directory, supported_ext):
             self.tags.append({})
@@ -31,8 +36,19 @@ class TagList:
                         self.tags[-1][tag_type.lower()] = tag_value
                 self.tags[-1]["filepath"] = file_path
 
+    def load_from_json(self, json_path: str) -> None:
+        with open(json_path, "r") as db:
+            self.tags = json.loads(db.read())
+
+    def save_as_json(self, save_path: str) -> None:
+        with open(save_path, "w") as db:
+            db.write(json.dumps(self.tags))
+
     def get_tags(self):
         return self.tags
+
+    def as_json_str(self):
+        return json.dumps(self.tags)
 
     def search(self, artist=None, album=None, title=None) -> List[str]:
         results = []
