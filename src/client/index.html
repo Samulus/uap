@@ -25,13 +25,29 @@
             <div class="col"><router-link class="col" to='/queue'   exact>Queue</router-link></div>
             <div class="col"><router-link class="col" to='/artists' exact>Artists</router-link></div>
             <div class="col"><router-link class="col" to='/albums'  exact>Albums</router-link></div>
+            <!-- (disable for now)
             <div class="col"><router-link class="col" to='/genres'  exact>Genres</router-link></div>
+            -->
             <div class="col"><refresh-library></refresh-library></div>
         </div>
     </template>
 
     <template id="song-queue">
-        <h1>Song Queue</h1>
+        <div>
+            <h1>Song Queue</h1>
+            <table>
+                <thead>
+                <tr>
+                    <th>Artist</th>
+                    <th>Album</th>
+                    <th>Track Number</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
     </template>
 
 
@@ -48,30 +64,55 @@
         </div>
     </template>
 
-    <template id="albums-view">
+    <template id="all-albums-view">
         <div>
-            <h1 v-if="viewing_specific_artist">{{artist_name}}</h1>
-            <div class="autogrid" v-if="viewing_specific_artist">
-                <router-link
-                        v-for="(_, album_name) in artist_albums"
-                        class="col-1-3"
-                        v-bind:to="'/albums/' + artist_name + '/' + album_name">{{album_name}}
-                </router-link>
-            </div>
-            <div v-else>
-                <div class="autogrid">
-                    <div v-for="(_, artist, index) in library" class="col1-1">
-                        <h2>{{artist}}</h2>
-                        <div class="autogrid">
-                            <router-link  class="col-1-3"
-                                    v-for="(_, album_name) in library[artist]"
-                                    class="col-1-3"
-                                    v-bind:to="'/albums/' + artist + '/' + album_name">{{album_name}}
-                            </router-link>
-                        </div>
+            <h1>Albums by Artist</h1>
+            <div class="autogrid">
+                <div v-for="(_, artist, index) in library" class="col-1-1">
+                    <h2>{{artist}}</h2>
+                    <div class="autogrid">
+                        <router-link  class="col-1-3"
+                                      v-for="(_, album_name) in library[artist]"
+                                      class="col-1-3"
+                                      v-bind:to="'/albums/' + artist + '/' + album_name">{{album_name}}
+                        </router-link>
                     </div>
                 </div>
             </div>
+        </div>
+    </template>
+
+    <template id="artist-albums-view">
+        <div>
+            <h1>{{artist_name}}</h1>
+            <div class="autogrid">
+                <router-link  class="col-1-3"
+                              v-for="(_, album_name) in artist_albums"
+                              class="col-1-3"
+                              v-bind:to="'/albums/' + artist_name + '/' + album_name">{{album_name}}
+                </router-link>
+            </div>
+        </div>
+    </template>
+
+    <template id="track-album-view">
+        <div>
+            <h1>{{artist_name}} / {{album_name}}</h1>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(_, track) in track_list">
+                        <td>{{track}}</td>
+                        <td><button class="btn small">Enqueue</button></td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </template>
 

@@ -11,10 +11,17 @@
     */
 
     const store = new Vuex.Store({
+
         state: {
-            library: JSON.parse(localStorage.getItem("library"))
+            library: JSON.parse(localStorage.getItem("library")),
+            song_queue: [],
         },
+
         mutations: {
+
+            add_song_to_queue: function() {
+            },
+
             refresh_library: function() {
                 Vue.http.get('api/library').then(
                     (function(response) {
@@ -53,25 +60,48 @@
         }
     });
 
-    Vue.component("albums-view", {
-        template: '#albums-view',
+    Vue.component("all-albums-view", {
+        template :"#all-albums-view",
+        data: function() {
+            return {};
+        },
         store: store,
         computed: {
-            viewing_specific_artist: function() {
-                return Object.keys(this.$route.params).length == 1;
-            },
+            library: function() {
+                return store.state.library;
+            }
+        },
+    })
 
+    Vue.component("artist-albums-view", {
+        template: '#artist-albums-view',
+        store: store,
+        computed: {
             artist_name: function() {
-                return Object.keys(this.$route.params).length == 0 ?
-                    "Albums" : this.$route.params.artist
+                return this.$route.params.artist;
             },
 
             artist_albums: function() {
-                return store.state.library[this.artist_name];
+                return store.state.library[this.$route.params.artist];
+            },
+        },
+    });
+
+    Vue.component("track-album-view", {
+        template: "#track-album-view",
+        store: store,
+        computed: {
+            artist_name: function() {
+                return this.$route.params.artist;
             },
 
-            library: function() {
-                return store.state.library;
+            album_name: function() {
+                return this.$route.params.album;
+            },
+
+            track_list: function() {
+                /* TODO: this can fail if either of these things are undefined */
+                return store.state.library[this.$route.params.artist][this.$route.params.album];
             }
         }
     });
@@ -86,8 +116,9 @@
 
     const routes = [
       { path: '/artists', component: 'artists-view' },
-      { path: '/albums/:artist', component: 'albums-view' },
-      { path: '/albums',  component: 'albums-view' },
+      { path: '/albums/:artist', component: 'artist-albums-view' },
+      { path: '/albums',  component: 'all-albums-view' },
+      { path: '/albums/:artist/:album', component: 'track-album-view' },
       { path: '/queue',  component: "song-queue" },
       { path: '/genres', component: "genre-view" },
       { path: '/',       redirect: '/queue', component: 'song-queue' },
