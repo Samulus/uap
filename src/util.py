@@ -1,8 +1,8 @@
-"""
-    util.py
-    Author: Samuel Vargas
-    Date: 10/30/2016
-"""
+#
+#   util.py
+#   Author: Samuel Vargas
+#   Date: 10/30/2016
+#
 
 import os
 from typing import Tuple, List

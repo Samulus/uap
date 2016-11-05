@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
-"""
-    uap.py
-    Author: Samuel Vargas
+#  
+#   uap.py
+#   Author: Samuel Vargas
 
-    TODO: introduce a configuration file so that users don't
-    have to manually specify the path of their music library
-    everytime they want to run the server.
-
-"""
+#   TODO: introduce a configuration file so that users don't
+#   have to manually specify the path of their music library
+#   everytime they want to run the server.
+   
 
 from bottle import route, run, static_file, template
 from sys import argv
