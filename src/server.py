@@ -52,7 +52,7 @@ class Server:
         artist = request.query.artist or None
         album = request.query.album or None
         title = request.query.title or None
-        return "not implemented ;-( "
+        return json.dumps(self._taglist.search(artist, album, title))
 
     def _library(self):
         return json.dumps(self._taglist.tag_hierarchy)
