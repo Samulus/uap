@@ -1,87 +1,85 @@
 #!/usr/bin/env python3
-
+#
 #   taglist.py
 #   Author: Samuel Vargas
 #   Date: 10/29/2016
-
+#
 #   TODO: taglib.File(file_path).tag.items() is extremely slow,
 #   it takes about 10-15 seconds on my 26GB library. We should
 #   either accept this and cache the database or write a faster
 #   solution loading all of the DESIRED_TAGS from the music
 #   library.
+#
+#   TODO: The module is including the absolute path that the music file
+#   was found at as part of the "filepath" key but this is a security risk
+#   and extraneous information that can be recalculated server side anyway.
+#   Modify the __construct_tag_list method to only include relative paths
+#   in its output.
 
 
-import taglib
-from src import util
-from typing import List
-from collections import OrderedDict
 import json
+import taglib
+from collections import OrderedDict
+from typing import List
+
+from src import util
 
 
 class TagList:
     SUPPORTED_EXT = (".mp3", ".ogg", ".flac")
-    DESIRED_TAGS = ("title", "artist", "album", "album artist", "year", "tracknumber", "genre")
+    DESIRED_TAGS = ("title", "artist", "album", "album artist",
+                    "year", "tracknumber", "genre")
 
-    def __init__(self, audio_directory=None, use_json_path=None, supported_ext=SUPPORTED_EXT,
-                 desired_tags=DESIRED_TAGS):
-
+    def __init__(self, audio_directory=None, use_json_path=None):
         self.tag_list = []
         self.tag_hierarchy = OrderedDict()
-        self.supported_ext = supported_ext
-        self.desired_tags = desired_tags
 
+        # raise exception if parameters are used incorrectly
         if (audio_directory is None and use_json_path is None or
                         audio_directory is not None and use_json_path is not None):
             raise ValueError("taglist.py: Specify an audio directory OR a json tag file")
 
+        # use path to offline json file instead of reloading audio files from directory
         if use_json_path is not None:
             with open(use_json_path, "r") as json_file:
                 self.tag_list = json.loads(json_file.read())
                 self.__construct_tag_hierarchy()
                 return
 
-        self.__construct_tag_list(audio_directory, supported_ext)
+        # build tag_list + tag_hierarchy for search and library api requests respectively
+        self.__construct_tag_list(audio_directory)
         self.__construct_tag_hierarchy()
 
-    def __construct_tag_list(self, audio_directory, supported_ext):
-        for file_path in util.get_audio_files(audio_directory, supported_ext):
+    def __construct_tag_list(self, audio_directory) -> None:
+        for file_path in util.get_audio_files(audio_directory, TagList.SUPPORTED_EXT):
             self.tag_list.append({})
             for tag_type, tag_value in taglib.File(file_path).tags.items():
-                for desired in self.desired_tags:
+                for desired in TagList.DESIRED_TAGS:
                     if tag_type.lower() == desired:
                         self.tag_list[-1][tag_type.lower()] = tag_value
                 self.tag_list[-1]["filepath"] = file_path
 
-    # only returns a usable result if "artist", "album", and "title" are in self.desired_tags
-    # TODO: handle missing tags
-    def __construct_tag_hierarchy(self):
+    # TODO: this function does not support audio files missing an (artist, album, title)
+    def __construct_tag_hierarchy(self) -> None:
         for tag in self.tag_list:
             artist = tag["artist"][0] if "artist" in tag else None
             album = tag["album"][0] if "album" in tag else None
             title = tag["title"][0] if "title" in tag else None
-            tags_to_omit = ("artist", "album", "title")
+            tags_to_omit_per_file = ("artist", "album", "title")
 
             # add root level artist tag to hierarchy
-            if artist and artist not in self.tag_hierarchy:
+            if artist not in self.tag_hierarchy:
                 self.tag_hierarchy[artist] = OrderedDict()
 
             # add album tag to existing artist
-            if album and artist in self.tag_hierarchy and album not in self.tag_hierarchy[artist]:
+            if artist in self.tag_hierarchy and album not in self.tag_hierarchy[artist]:
                 self.tag_hierarchy[artist][album] = OrderedDict()
 
             # add title tag to existing album
-            if title and artist in self.tag_hierarchy and album in self.tag_hierarchy[artist] and title not in \
+            if artist in self.tag_hierarchy and album in self.tag_hierarchy[artist] and title not in \
                     self.tag_hierarchy[artist][album]:
                 self.tag_hierarchy[artist][album][title] = {tag_type: tag_value for tag_type, tag_value in tag.items()
-                                                            if tag_type not in tags_to_omit}
-
-    def get_artists(self):
-        artist_list = []
-        last_artist = None
-        for tag in self.tag_list:
-            if "artist" in tag and (last_artist is None or tag["artist"] != last_artist):
-                artist_list.append(tag["artist"])
-        return artist_list
+                                                            if tag_type not in tags_to_omit_per_file}
 
     def search(self, artist=None, album=None, title=None) -> List[str]:
         results = []
@@ -101,9 +99,5 @@ class TagList:
                     hits += 1
             if hits == hits_needed:
                 results.append(tag)
+
         return results
-
-
-if __name__ == '__main__':
-    # TagList("/home/sam/music/")
-    pass
