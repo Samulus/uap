@@ -90,6 +90,12 @@
     Vue.component("track-album-view", {
         template: "#track-album-view",
         store: store,
+        methods: {
+            enqueue: function(track) {
+                alert("Can't enqueue track\", " + track + ",\"because this feature is not implemented");
+            }
+        },
+
         computed: {
             artist_name: function() {
                 return this.$route.params.artist;
