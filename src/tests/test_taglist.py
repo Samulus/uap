@@ -67,3 +67,16 @@ class TagListTest(TestCase):
             assert(len(search_results) == albums_with_money_in_title)
             for result in search_results:
                 assert result["title"][0].endswith(shared_album_titles)
+
+    @staticmethod
+    def test_search_for_artist():
+        """
+        Get every entry by a single artist
+        """
+        death_grips_entries = len(
+            [x for x in TagListTest.TEST_DATA if 'artist' in x and x['artist'] == 'Death Grips']
+        )
+        with MockLibrary(TagListTest.TEST_DATA) as library:
+            taglist = TagList(audio_directory=library.path)
+            search_results = taglist.search(artist='Death Grips')
+            assert(len(search_results) == death_grips_entries)
