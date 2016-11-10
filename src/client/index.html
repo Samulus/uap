@@ -41,11 +41,17 @@
                 <tr>
                     <th>Artist</th>
                     <th>Album</th>
-                    <th>Track Number</th>
+                    <th>Title</th>
                     <th>Actions</th>
                 </tr>
                 </thead>
                 <tbody>
+                    <tr v-for="(track, i) in get_tracks">
+                        <td>{{track.artist}}</td>
+                        <td>{{track.album}}</td>
+                        <td>{{track.title}}</td>
+                        <td><button class="btn small" v-on:click="remove(i)">Remove</button></td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -133,6 +139,8 @@
     <script src="js/lib/vue-resource.min.js"></script>
     <script src="js/lib/vuex.min.js"></script>
     <script>Vue.config.devtools = true;</script>
-    <script src="js/client.js"></script>
+    <script src="js/store.js"></script>
+    <script src="js/component.js"></script>
+    <script src="js/route.js"></script>
     </body>
 </html>

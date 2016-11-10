@@ -6,7 +6,7 @@
 #
 #   The server module is dual purposed: It serves as the
 #   RESTful API (send GET requests to api/search and api/library)
-#   and also serves a basic web client (client/index.html and client/client.js)
+#   and also serves a basic web client (client/index.html and client/*.js)
 #   if you send a GET request to ('/'). The only requirement is that you pass
 #   in a TagList object (see src.taglist).
 
