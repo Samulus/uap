@@ -19,9 +19,9 @@
 
 import json
 import taglib
+import os
 from collections import OrderedDict
 from typing import List
-
 from src import util
 
 
@@ -51,9 +51,9 @@ class TagList:
         self.__construct_tag_hierarchy()
 
     def __construct_tag_list(self, audio_directory) -> None:
-        for file_path in util.get_audio_files(audio_directory, TagList.SUPPORTED_EXT):
+        for file_path in util.get_files_with_ext(audio_directory, TagList.SUPPORTED_EXT):
             self.tag_list.append({})
-            for tag_type, tag_value in taglib.File(file_path).tags.items():
+            for tag_type, tag_value in taglib.File(os.path.join(audio_directory, file_path)).tags.items():
                 for desired in TagList.DESIRED_TAGS:
                     if tag_type.lower() == desired:
                         self.tag_list[-1][tag_type.lower()] = tag_value
@@ -80,6 +80,10 @@ class TagList:
                     self.tag_hierarchy[artist][album]:
                 self.tag_hierarchy[artist][album][title] = {tag_type: tag_value for tag_type, tag_value in tag.items()
                                                             if tag_type not in tags_to_omit_per_file}
+
+    def dump_to_json_file(self, filepath: str):
+        with open(filepath, "w") as output_file:
+            output_file.write(json.dumps(self.tag_list))
 
     def search(self, artist=None, album=None, title=None) -> List[str]:
         results = []
