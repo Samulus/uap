@@ -16,7 +16,11 @@ from src.taglist import TagList
 from src.server import Server
 import os
 
+ROOT_PATH = os.path.realpath(os.path.join(__file__, ".."))
+MUSIC_PATH = "/home/sam/music"  # change this to whatever on your system
+MOCK_TAGS_PATH = os.path.join(ROOT_PATH, "tags.json")
+
 if __name__ == '__main__':
-    file_path = os.path.realpath(os.path.join(__file__, ".."))
-    tag_path = os.path.join(file_path, "tags.json")
-    Server(TagList(use_json_path=tag_path)).start()
+    if not os.path.exists(MOCK_TAGS_PATH):
+        TagList(audio_directory=MUSIC_PATH).dump_to_json_file(MOCK_TAGS_PATH)
+    Server(TagList(use_json_path=MOCK_TAGS_PATH)).start()
