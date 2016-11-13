@@ -1,3 +1,18 @@
+/*
+    vital css overrides
+*/
+input:hover, input:focus, select:hover, select:focus, textarea:hover, textarea:focus {
+    border-color: #96C587;
+}
+
+/*
+    uap specific
+*/
+
+.form-item {
+    margin-bottom:0.5em;
+}
+
 body {
     padding: 2.5em;
     margin-bottom: 2em;
@@ -12,4 +27,14 @@ select {
     width: 100%;
     margin-bottom: 1.5em;
     overflow-y:scroll;
+}
+
+center {
+  position:absolute;
+  top:40%;
+  left:50%;
+  padding:10px;
+  -ms-transform: translateX(-50%) translateY(-50%);
+  -webkit-transform: translate(-50%,-50%);
+  transform: translate(-50%,-50%);
 }
