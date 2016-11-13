@@ -90,3 +90,6 @@ ENV/
 
 # intellij
 .idea/
+
+# uap_cookies
+uap_cookies/
