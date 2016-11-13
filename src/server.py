@@ -10,41 +10,88 @@
 #   if you send a GET request to ('/'). The only requirement is that you pass
 #   in a TagList object (see src.taglist).
 
+#   TODO: This needs to be a fully static class.
+#   TODO: STOP ACCEPTING PASSWORDS via PLAINTEXT
+
 
 import json
 import os
 
-from bottle import static_file, request, Bottle
+import bottle
+from beaker.middleware import SessionMiddleware
+from bottle import static_file, request, redirect
+
+from src.sessiondb import SessionDB
 from src.taglist import TagList
 
 
-class Server:
+class Server(SessionMiddleware):
     ROOT_PATH = os.path.realpath(os.path.join(__file__, ".."))
     VALID_SEARCH_TYPES = ("artist", "album", "title")
 
-    def __init__(self, taglist: TagList, host='127.0.0.1', port=8080):
-        self._taglist = taglist
-        self._port = port
-        self._host = host
-        self._app = Bottle()
-        self._app.route("/", method="GET", callback=self._index)
-        self._app.route("/<filename:re:.*\.css>", method="GET", callback=self._static)
-        self._app.route("/<filename:re:.*\.js>", method="GET", callback=self._static)
-        self._app.route("/<filename:re:.*\.min.map>", method="GET", callback=self._static)
-        self._app.route("/api/search", method="GET", callback=self._search)
-        self._app.route("/api/search/", method="GET", callback=self._search)
-        self._app.route("/api/library", method="GET", callback=self._library)
-        self._app.route("/api/library/", method="GET", callback=self._library)
+    with open(os.path.join(ROOT_PATH, "client/index.html"), "r") as app_html:
+        APP_HTML = app_html.read()
+
+    with open(os.path.join(ROOT_PATH, "client/login.html"), "r") as login_html:
+        LOGIN_HTML = login_html.read()
+
+    session_opts = {
+        'session.type': 'file',
+        'session.cookie_expires': 300,
+        'session.data_dir': './uap_cookies',
+        'session.auto': True
+    }
+
+    def __init__(self, sessiondb: SessionDB, taglist: TagList, host='127.0.0.1', port=8080, public_mode=True, reloader=False, debug=False):
+        super(Server, self).__init__(bottle.app(), Server.session_opts)
+        self.__sessiondb = sessiondb
+        self.__public_mode = public_mode
+        self.__taglist = taglist
+        self.__port = port
+        self.__host = host
+        self.__reloader = reloader
+        self.__debug = debug
+
+        # serve main app
+        bottle.route("/", method="GET", callback=self.__index)
+
+        # process signup post
+        bottle.route("/api/signup", method="POST", callback=self.__sign_up)
+        bottle.route("/api/signup/", method="POST", callback=self.__sign_up)
+
+        # static content
+        bottle.route("/<filename:re:.*\.css>", method="GET", callback=self.__static_file)
+        bottle.route("/<filename:re:.*\.js>", method="GET", callback=self.__static_file)
+        bottle.route("/<filename:re:.*\.min.map>", method="GET", callback=self.__static_file)
+
+        # restful API
+        bottle.route("/api/search", method="GET", callback=self._search)
+        bottle.route("/api/search/", method="GET", callback=self._search)
+        bottle.route("/api/library", method="GET", callback=self._library)
+        bottle.route("/api/library/", method="GET", callback=self._library)
 
     def start(self):
-        self._app.run(host=self._host, port=self._port)
+        bottle.run(app=self, host=self.__host, port=self.__port, reloader=self.__reloader, debug=self.__debug)
 
-    def _index(self):
-        html_path = os.path.join(Server.ROOT_PATH, "client/index.html")
-        with open(html_path, "r") as html:
-            return html.read()
+    def __sign_up(self):
+        username = request.forms.get('username')
+        password = request.forms.get('password')
+        print("New Signup Request: {0}, {1}".format(username, password))
 
-    def _static(self, filename: str):
+    def session_is_valid(self):
+        cookie = bottle.request.environ.get('beaker.session')
+        self.__sessiondb.STUB_user_is_logged_in(return_truth=True)
+        return True
+
+        #if self.__public_mode or 'user_id' in session and :
+            #return False
+        #else:
+            #return True
+
+    def __index(self):
+        return Server.APP_HTML if self.session_is_valid() else Server.LOGIN_HTML
+
+    def __static_file(self, filename: str):
         static_root_path = os.path.join(Server.ROOT_PATH, "client/")
         return static_file(filename, root=static_root_path)
 
@@ -52,7 +99,7 @@ class Server:
         artist = request.query.artist or None
         album = request.query.album or None
         title = request.query.title or None
-        return json.dumps(self._taglist.search(artist, album, title))
+        return json.dumps(self.__taglist.search(artist, album, title))
 
     def _library(self):
-        return json.dumps(self._taglist.tag_hierarchy)
+        return json.dumps(self.__taglist.tag_hierarchy)
