@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:v-on="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>uap</title>
+        <link rel="stylesheet" href="css/vital.min.css">
+        <link rel="stylesheet" href="css/vital.min.map">
+        <link rel="stylesheet" href="css/layout.css">
+    </head>
+
+    <body>
+        <center>
+            <h1>Login</h1>
+
+            <template id="login-component">
+                <div class="full-width-forms">
+                    <input placeholder="Username" type="text" class="form-item" v-model="username">
+                    <input placeholder="Password" type="password" class="form-item" v-model="password">
+                    <div class="autogrid">
+                        <a href="/" class="col 1-2 form-item btn green">Login</a>
+                        <a href="/" class="col 1-2 form-item btn blue" v-on:click="signup">Signup</a>
+                    </div>
+                </div>
+            </template>
+
+            <div id="login"></div>
+        </center>
+    </body>
+
+    <script src="js/lib/vue.js"></script>
+    <script src="js/lib/vue-resource.min.js"></script>
+
+    <script>
+        Vue.http.options.emulateJSON = true;
+        var login_vm = new Vue({
+            template: "#login-component",
+            el: "#login",
+            data: {
+                username: '',
+                password: '',
+            },
+            methods: {
+                signup: function() {
+                    Vue.http.post('api/signup', {
+                        'username': this.$data.username,
+                        'password': this.$data.password,
+                    });
+                }
+            }
+        });
+
+    </script>
+
+</html>
