@@ -23,6 +23,7 @@ from bottle import static_file, request, redirect
 
 from src.sessiondb import SessionDB
 from src.taglist import TagList
+from src.userdb import UserDB
 
 
 class Server(SessionMiddleware):
@@ -42,8 +43,9 @@ class Server(SessionMiddleware):
         'session.auto': True
     }
 
-    def __init__(self, sessiondb: SessionDB, taglist: TagList, host='127.0.0.1', port=8080, public_mode=True, reloader=False, debug=False):
+    def __init__(self, sessiondb: SessionDB, userdb: UserDB, taglist: TagList, host='127.0.0.1', port=8080, public_mode=True, reloader=False, debug=False):
         super(Server, self).__init__(bottle.app(), Server.session_opts)
+        self.__userdb = userdb
         self.__sessiondb = sessiondb
         self.__public_mode = public_mode
         self.__taglist = taglist
@@ -79,8 +81,7 @@ class Server(SessionMiddleware):
         print("New Signup Request: {0}, {1}".format(username, password))
 
     def session_is_valid(self):
-        cookie = bottle.request.environ.get('beaker.session')
-        self.__sessiondb.STUB_user_is_logged_in(return_truth=True)
+        #cookie = bottle.request.environ.get('beaker.session')
         return True
 
         #if self.__public_mode or 'user_id' in session and :
