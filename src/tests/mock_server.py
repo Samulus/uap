@@ -14,6 +14,7 @@
 from src.sessiondb import SessionDB
 from src.taglist import TagList
 from src.server import Server
+from src.userdb import UserDB
 import os
 
 ROOT_PATH = os.path.realpath(os.path.join(__file__, ".."))
@@ -23,9 +24,11 @@ MOCK_TAGS_PATH = os.path.join(ROOT_PATH, "tags.json")
 if __name__ == '__main__':
     if not os.path.exists(MOCK_TAGS_PATH):
         TagList(audio_directory=MUSIC_PATH).dump_to_json_file(MOCK_TAGS_PATH)
+
     Server(
         taglist=TagList(use_json_path=MOCK_TAGS_PATH),
         sessiondb=SessionDB(),
+        userdb=UserDB(),
         debug=True,
         public_mode=False,
         reloader=True).start()
