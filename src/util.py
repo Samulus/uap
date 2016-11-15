@@ -28,3 +28,7 @@ def get_files_with_ext(audio_directory: str, supported_ext: Tuple) -> List[str]:
             if file_path.lower().endswith(supported_ext):
                 audio_files.append(os.path.relpath(os.path.join(dir_name, file_path), audio_directory))
     return audio_files
+
+
+def sanitize_input(input: str) -> str:
+    pass
