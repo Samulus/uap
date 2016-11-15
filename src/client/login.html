@@ -5,12 +5,12 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>uap</title>
         <link rel="stylesheet" href="css/vital.min.css">
-        <link rel="stylesheet" href="css/vital.min.map">
         <link rel="stylesheet" href="css/layout.css">
     </head>
 
     <body>
         <center>
+
             <h1>Login</h1>
 
             <template id="login-component">
@@ -18,38 +18,23 @@
                     <input placeholder="Username" type="text" class="form-item" v-model="username">
                     <input placeholder="Password" type="password" class="form-item" v-model="password">
                     <div class="autogrid">
-                        <a href="/" class="col 1-2 form-item btn green">Login</a>
-                        <a href="/" class="col 1-2 form-item btn blue" v-on:click="signup">Signup</a>
+                        <a href="/" class="col 1-2 form-item btn green" v-on:click="action('login', $event)">Login</a>
+                        <a href="/" class="col 1-2 form-item btn blue"  v-on:click="action('signup', $event)">Signup</a>
+                        <transition name="fade">
+                            <div class="row notice" v-if="error">{{error_message}}</div>
+                        </transition>
                     </div>
                 </div>
             </template>
 
             <div id="login"></div>
+
         </center>
     </body>
 
     <script src="js/lib/vue.js"></script>
     <script src="js/lib/vue-resource.min.js"></script>
-
-    <script>
-        Vue.http.options.emulateJSON = true;
-        var login_vm = new Vue({
-            template: "#login-component",
-            el: "#login",
-            data: {
-                username: '',
-                password: '',
-            },
-            methods: {
-                signup: function() {
-                    Vue.http.post('api/signup', {
-                        'username': this.$data.username,
-                        'password': this.$data.password,
-                    });
-                }
-            }
-        });
-
-    </script>
+    <script src="js/lib/scrypt.js"></script>
+    <script src="js/login.js"></script>
 
 </html>
