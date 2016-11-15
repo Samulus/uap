@@ -93,3 +93,9 @@ ENV/
 
 # uap_cookies
 uap_cookies/
+
+# database files
+database/users.json
+database/session.json
+database/musicfiles.json
+database/tags.json
