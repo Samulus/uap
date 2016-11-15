@@ -30,5 +30,5 @@ if __name__ == '__main__':
         sessiondb=SessionDB(),
         userdb=UserDB(),
         debug=True,
-        public_mode=False,
+        login_required=False,
         reloader=True).start()
