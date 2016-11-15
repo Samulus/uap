@@ -38,3 +38,13 @@ center {
   -webkit-transform: translate(-50%,-50%);
   transform: translate(-50%,-50%);
 }
+
+/* transitions */
+.fade-enter-active, .fade-leave-active {
+   transition: opacity .5s;
+  -webkit-transition: opacity .5s;
+}
+.fade-enter, .fade-leave-active {
+  opacity: 0;
+  -webkit-opacity: 0;
+}
