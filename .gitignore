@@ -95,7 +95,8 @@ ENV/
 uap_cookies/
 
 # database files
-database/users.json
-database/session.json
-database/musicfiles.json
-database/tags.json
+/src/database/users.json
+/src/database/session.json
+/src/database/musicfiles.json
+/src/database/tags.json
+/src/database/users.json
