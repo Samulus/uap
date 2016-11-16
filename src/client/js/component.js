@@ -4,6 +4,28 @@
     Date: 10/31/2016
 */
 
+Vue.http.options.emulateJSON = true;
+
+Vue.component('signout-component', {
+    template: "#signout-component",
+    methods: {
+        signout: function(event) {
+            event.preventDefault();
+            Vue.http.post('api/logout', {
+                'session_id': Cookies.get('beaker.session.id')
+            }).then(
+                function success(response) {
+                    // VERY gross
+                    window.location.href = "../../"
+                },
+                function failure(response) {
+                    alert("Could not sign out, try again later.");
+                    }
+                );
+            }
+        }
+});
+
 Vue.component('refresh-library', {
     template: "#refresh-library",
     store: store,

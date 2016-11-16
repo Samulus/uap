@@ -11,7 +11,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>uap</title>
         <link rel="stylesheet" href="css/layout.css">
-        <link rel="stylesheet" href="css/vital.min.map">
+        <link rel="stylesheet" href="css/vital.min.css">
     </head>
 
     <body>
@@ -25,11 +25,13 @@
             <div class="col"><router-link class="col" to='/queue'   exact>Queue</router-link></div>
             <div class="col"><router-link class="col" to='/artists' exact>Artists</router-link></div>
             <div class="col"><router-link class="col" to='/albums'  exact>Albums</router-link></div>
-            <!-- (disable for now)
-            <div class="col"><router-link class="col" to='/genres'  exact>Genres</router-link></div>
-            -->
+            <div class="col"><signout-component></signout-component></div>
             <div class="col"><refresh-library></refresh-library></div>
         </div>
+    </template>
+
+    <template id="signout-component">
+        <button class="btn round no-outline red" v-on:click="signout($event)">Sign Out</button>
     </template>
 
     <template id="song-queue">
@@ -136,8 +138,9 @@
     <script src="js/lib/vue.js"></script>
     <script src="js/lib/vue-router.min.js"></script>
     <script src="js/lib/vue-resource.min.js"></script>
+    <script src="js/lib/js.cookie.js"></script>
     <script src="js/lib/vuex.min.js"></script>
-    <script>vue.config.devtools = true;</script>
+    <script>Vue.config.devtools = true;</script>
     <script src="js/store.js"></script>
     <script src="js/component.js"></script>
     <script src="js/route.js"></script>
