@@ -11,7 +11,7 @@
 #   using this mock implementation. We need to monkey patch
 #   the server to return sample audio every time the user requests
 #   a specific audio file.
-from src.sessiondb import SessionDB
+
 from src.taglist import TagList
 from src.server import Server
 from src.userdb import UserDB
@@ -27,8 +27,7 @@ if __name__ == '__main__':
 
     Server(
         taglist=TagList(use_json_path=MOCK_TAGS_PATH),
-        sessiondb=SessionDB(),
-        userdb=UserDB(),
+        userdb=UserDB(use_debug_db=True),
         debug=True,
         login_required=False,
         reloader=True).start()
