@@ -7,15 +7,15 @@
 #   The server module is dual purposed: It serves as the
 #   RESTful API (send GET requests to api/search and api/library)
 #   and also serves a basic web client (client/index.html and client/*.js)
-#   if you send a GET request to ('/'). The only requirement is that you pass
-#   in a TagList object (see src.taglist).
+#   if you send a GET request to ('/').
+#
 
 import json
 import os
 
 import bottle
 from beaker.middleware import SessionMiddleware
-from bottle import static_file, request, response, redirect
+from bottle import static_file, request, response
 
 from src.taglist import TagList
 from src.userdb import UserDB
@@ -39,8 +39,8 @@ class Server(SessionMiddleware):
         'session.auto': True
     }
 
-    def __init__(self, userdb: UserDB, taglist: TagList, host='127.0.0.1', port=8080,
-                 login_required=True, reloader=False, debug=False):
+    def __init__(self, userdb: UserDB, taglist: TagList, host='127.0.0.1',
+                 port=8080, login_required=True, reloader=False, debug=False):
         super(Server, self).__init__(bottle.app(), Server.session_opts)
         self.__userdb = userdb
         self.__login_required = login_required
@@ -53,7 +53,8 @@ class Server(SessionMiddleware):
         # serve main index / application
         bottle.route("/", "GET", self.__index)
 
-        # login / signup, these return either return the HTTP status 200 + a unique session_token, or status 401
+        # login / signup, these return either
+        # HTTP status 200 or HTTP status 4xx to denote an error
         bottle.route("/api/signup", "POST", self.__sign_up)
         bottle.route("/api/signup/", "POST", self.__sign_up)
         bottle.route("/api/login", "POST", self.__login)
@@ -75,7 +76,11 @@ class Server(SessionMiddleware):
         bottle.route("/api/library/", "GET", self.__library)
 
     def start(self):
-        bottle.run(app=self, host=self.__host, port=self.__port, reloader=self.__reloader, debug=self.__debug)
+        bottle.run(app=self,
+                   host=self.__host,
+                   port=self.__port,
+                   reloader=self.__reloader,
+                   debug=self.__debug)
 
     def __logout(self):
         # get their session_id, find the user that has this
@@ -86,20 +91,21 @@ class Server(SessionMiddleware):
 
     def __login(self):
         # TODO: input sanitation
-        # TODO: we should be using SSL eventually
         username = request.forms.get('username') or None
         password = request.forms.get('password') or None
 
         # if they fail to specify either -> its a bad request
         if username is None or password is None:
-            response.status = '400 You forgot to specify a username, a password, or both.'
+            response.status = '400 Specify a username and password.'
             return
 
-        # notify the user their password is bad or the account doesn't exist (but don't specify which)
-        if not (self.__userdb.find_user(username) and self.__userdb.log_user_in(username, password)):
+        # no such user, bad password -> notify user of bad request
+        if not (self.__userdb.find_user(username) and
+                self.__userdb.log_user_in(username, password)):
             response.status = '401 Bad Password or Non-Existent Account'
             return
-        # otherwise authenticate them
+
+        # authenticate the user
         else:
             response.status = '200 Login Successful'
             session = bottle.request.environ.get('beaker.session')
@@ -107,13 +113,12 @@ class Server(SessionMiddleware):
 
     def __sign_up(self):
         # TODO: input sanitation
-        # TODO: we should be using SSL eventually
         username = request.forms.get('username') or None
         password = request.forms.get('password') or None
 
         # if they fail to specify either -> its a bad request
         if username is None or password is None:
-            response.status = '400 You forgot to specify a username, a password, or both.'
+            response.status = '400 Specify a username and a password.'
             return
 
         # avoid signing up users with identical names
@@ -123,12 +128,13 @@ class Server(SessionMiddleware):
 
         # avoid signing up users with username
         # and passwords that contain invalid lengths
-        elif (not password_is_valid_length(password, min_length=8, max_length=512)
-              or not username_is_valid_length(username, min_length=1, max_length=32)):
-            response.status = '400 Passwords must be between 8 to 512 chars: Usernames 1 to 32 chars'
+        elif (not password_is_valid_length(password, 8, 512)
+              or not username_is_valid_length(username, 1, 32)):
+            response.status = ('400 Password must be between 8 and 512 chars'
+                               'Username must be between 1 and 32 chars')
             return
 
-        # everything is ok -> create the new user and send them their session_id
+        # send session id for newly created user if all is well
         else:
             response.status = "200 Welcome to uap!"
             self.__userdb.add_user(username, password)
@@ -137,7 +143,9 @@ class Server(SessionMiddleware):
 
     def __session_is_valid(self):
         session = bottle.request.environ.get('beaker.session')
-        return 'session_id' in session and self.__userdb.is_valid_session_id(session['session_id'])
+        if 'session_id' not in session:
+            return False
+        return self.__userdb.is_valid_session_id(session['session_id'])
 
     def __index(self):
         if self.__session_is_valid():
