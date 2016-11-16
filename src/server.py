@@ -15,9 +15,8 @@ import os
 
 import bottle
 from beaker.middleware import SessionMiddleware
-from bottle import static_file, request, response
+from bottle import static_file, request, response, redirect
 
-from src.sessiondb import SessionDB
 from src.taglist import TagList
 from src.userdb import UserDB
 from src.validation import username_is_valid_length, password_is_valid_length
@@ -40,11 +39,10 @@ class Server(SessionMiddleware):
         'session.auto': True
     }
 
-    def __init__(self, sessiondb: SessionDB, userdb: UserDB, taglist: TagList, host='127.0.0.1', port=8080,
+    def __init__(self, userdb: UserDB, taglist: TagList, host='127.0.0.1', port=8080,
                  login_required=True, reloader=False, debug=False):
         super(Server, self).__init__(bottle.app(), Server.session_opts)
         self.__userdb = userdb
-        self.__sessiondb = sessiondb
         self.__login_required = login_required
         self.__taglist = taglist
         self.__port = port
@@ -61,6 +59,10 @@ class Server(SessionMiddleware):
         bottle.route("/api/login", "POST", self.__login)
         bottle.route("/api/login/", "POST", self.__login)
 
+        # signout
+        bottle.route("/api/logout", "POST", self.__logout)
+        bottle.route("/api/logout/", "POST", self.__logout)
+
         # static content
         bottle.route("/<filename:re:.*\.css>", "GET", self.__static_file)
         bottle.route("/<filename:re:.*\.js>", "GET", self.__static_file)
@@ -75,6 +77,34 @@ class Server(SessionMiddleware):
     def start(self):
         bottle.run(app=self, host=self.__host, port=self.__port, reloader=self.__reloader, debug=self.__debug)
 
+    def __logout(self):
+        # get their session_id, find the user that has this
+        # session ID and overwrite it.
+        session = bottle.request.environ.get('beaker.session')
+        if 'session_id' in session:
+            self.__userdb.create_new_user_session(session['session_id'])
+
+    def __login(self):
+        # TODO: input sanitation
+        # TODO: we should be using SSL eventually
+        username = request.forms.get('username') or None
+        password = request.forms.get('password') or None
+
+        # if they fail to specify either -> its a bad request
+        if username is None or password is None:
+            response.status = '400 You forgot to specify a username, a password, or both.'
+            return
+
+        # notify the user their password is bad or the account doesn't exist (but don't specify which)
+        if not (self.__userdb.find_user(username) and self.__userdb.log_user_in(username, password)):
+            response.status = '401 Bad Password or Non-Existent Account'
+            return
+        # otherwise authenticate them
+        else:
+            response.status = '200 Login Successful'
+            session = bottle.request.environ.get('beaker.session')
+            session['session_id'] = self.__userdb.get_user_session_id(username)
+
     def __sign_up(self):
         # TODO: input sanitation
         # TODO: we should be using SSL eventually
@@ -87,42 +117,52 @@ class Server(SessionMiddleware):
             return
 
         # avoid signing up users with identical names
-        if self.__userdb.user_exists(username):
+        elif self.__userdb.find_user(username):
             response.status = '409 This username is already taken.'
             return
 
         # avoid signing up users with username
-        # and passwords that contain invalid values
-        if (not password_is_valid_length(password, min_length=8, max_length=512)
-             or not username_is_valid_length(username, min_length=1, max_length=32)):
-            response.status = 400  # Bad Request
-            response.responseText = 'Passwords must be between 8 to 512 chars: Usernames 1 to 32 chars'
+        # and passwords that contain invalid lengths
+        elif (not password_is_valid_length(password, min_length=8, max_length=512)
+              or not username_is_valid_length(username, min_length=1, max_length=32)):
+            response.status = '400 Passwords must be between 8 to 512 chars: Usernames 1 to 32 chars'
             return
 
-    def __login(self):
-        pass
+        # everything is ok -> create the new user and send them their session_id
+        else:
+            response.status = "200 Welcome to uap!"
+            self.__userdb.add_user(username, password)
+            session = bottle.request.environ.get('beaker.session')
+            session['session_id'] = self.__userdb.get_user_session_id(username)
 
-    def session_is_valid(self):
-        # cookie = bottle.request.environ.get('beaker.session')
-        return False
-
-        # if self.__public_mode or 'user_id' in session and :
-        # return False
-        # else:
-        # return True
+    def __session_is_valid(self):
+        session = bottle.request.environ.get('beaker.session')
+        return 'session_id' in session and self.__userdb.is_valid_session_id(session['session_id'])
 
     def __index(self):
-        return Server.APP_HTML if self.session_is_valid() else Server.LOGIN_HTML
+        if self.__session_is_valid():
+            return Server.APP_HTML
+        else:
+            return Server.LOGIN_HTML
 
     def __static_file(self, filename: str):
-        static_root_path = os.path.join(Server.ROOT_PATH, "client/")
-        return static_file(filename, root=static_root_path)
+        if self.__session_is_valid():
+            static_root_path = os.path.join(Server.ROOT_PATH, "client/")
+            return static_file(filename, root=static_root_path)
+        else:
+            response.status = "401 Login First"
 
     def __search(self):
-        artist = request.query.artist or None
-        album = request.query.album or None
-        title = request.query.title or None
-        return json.dumps(self.__taglist.search(artist, album, title))
+        if self.__session_is_valid():
+            artist = request.query.artist or None
+            album = request.query.album or None
+            title = request.query.title or None
+            return json.dumps(self.__taglist.search(artist, album, title))
+        else:
+            response.status = "401 Login First"
 
     def __library(self):
-        return json.dumps(self.__taglist.tag_hierarchy)
+        if self.__session_is_valid():
+            return json.dumps(self.__taglist.tag_hierarchy)
+        else:
+            response.status = "401 Login First"
