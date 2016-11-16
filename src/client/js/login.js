@@ -9,8 +9,8 @@ var login_vm = new Vue({
     template: "#login-component",
     el: "#login",
     data: {
-        error: false,
-        error_message: '',
+        got_message_from_server: false,
+        message: '',
         username: '',
         password: '',
     },
@@ -23,15 +23,13 @@ var login_vm = new Vue({
                 'password': this.$data.password,
             }).then(
                 function success(response) {
-                    console.log('EVERYTHING IS PEACHY KEEN');
-                    console.log(response.statusText);
-                    alert(response.statusText);
+                    location.reload()
                 },
                 function failure(response) {
-                    login_vm.$data.error = true;
-                    login_vm.$data.error_message = response.statusText;
+                    login_vm.$data.got_message_from_server = true;
+                    login_vm.$data.message = response.statusText;
                     setTimeout(function() {
-                        login_vm.$data.error = false;
+                        login_vm.$data.got_message_from_server = false;
                     }, 3000);
                 }
             );

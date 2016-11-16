@@ -21,7 +21,7 @@
                         <a href="/" class="col 1-2 form-item btn green" v-on:click="action('login', $event)">Login</a>
                         <a href="/" class="col 1-2 form-item btn blue"  v-on:click="action('signup', $event)">Signup</a>
                         <transition name="fade">
-                            <div class="row notice" v-if="error">{{error_message}}</div>
+                            <div class="row notice" v-if="got_message_from_server">{{message}}</div>
                         </transition>
                     </div>
                 </div>
