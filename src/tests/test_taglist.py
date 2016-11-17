@@ -7,9 +7,10 @@
 #   we need to add more tests to handle erroneous data and other situations
 #   but this module is a start.
 
-from unittest import TestCase
 import unittest
-from src.tests.mock_library import MockLibrary
+from unittest import TestCase
+
+from src.mocks.mock_library import MockLibrary
 from src.taglist import TagList
 
 
@@ -53,7 +54,7 @@ class TagListTest(TestCase):
                               'title' in x and 'album' in x and x['album'] == ALBUM_KEYWORD])
 
         with MockLibrary(TagListTest.TEST_DATA) as library:
-            taglist = TagList(audio_directory=library.path)
+            taglist = TagList(audio_folder=library.path)
             search_results = taglist.search(album=PARTIAL_ALBUM_KEYWORD)
             # ensure we find every album that is tagged with 'The Money Store'
             assert (len(search_results) == money_store_entries)
@@ -72,7 +73,7 @@ class TagListTest(TestCase):
         albums_with_money_in_title = len([x for x in TagListTest.TEST_DATA if 'album' in x and ALBUM_KEYWORD in x['album']])
         shared_album_titles = tuple([x['title'] for x in TagListTest.TEST_DATA if 'album' in x and ALBUM_KEYWORD in x['album']])
         with MockLibrary(TagListTest.TEST_DATA) as library:
-            taglist = TagList(audio_directory=library.path)
+            taglist = TagList(audio_folder=library.path)
             search_results = taglist.search(album=ALBUM_KEYWORD)
             assert(len(search_results) == albums_with_money_in_title)
             for result in search_results:
@@ -88,7 +89,7 @@ class TagListTest(TestCase):
             [x for x in TagListTest.TEST_DATA if 'artist' in x and x['artist'] == ARTIST_KEYWORD]
         )
         with MockLibrary(TagListTest.TEST_DATA) as library:
-            taglist = TagList(audio_directory=library.path)
+            taglist = TagList(audio_folder=library.path)
             search_results = taglist.search(artist=ARTIST_KEYWORD)
             assert(len(search_results) == death_grips_entries)
 
