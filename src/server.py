@@ -33,9 +33,8 @@ class Server(SessionMiddleware):
         LOGIN_HTML = login_html.read()
 
     session_opts = {
-        'session.type': 'file',
+        'session.type': 'memory',
         'session.cookie_expires': 300,
-        'session.data_dir': './uap_cookies',
         'session.auto': True
     }
 
@@ -74,6 +73,8 @@ class Server(SessionMiddleware):
         bottle.route("/api/search/", "GET", self.__search)
         bottle.route("/api/library", "GET", self.__library)
         bottle.route("/api/library/", "GET", self.__library)
+
+        bottle.route("/api/song/:song_path", "GET", self.get_song)
 
     def start(self):
         bottle.run(app=self,
@@ -130,7 +131,7 @@ class Server(SessionMiddleware):
         # and passwords that contain invalid lengths
         elif (not string_is_valid_length(password, min_len=8, max_len=512)
               or not string_is_valid_length(username, min_len=1, max_len=32)):
-            response.status = ('400 Password must be 8 to 512 chars'
+            response.status = ('400 Password must be 8 to 512 chars. '
                                'Username must be between 1 and 32 chars')
             return
 
@@ -141,14 +142,14 @@ class Server(SessionMiddleware):
             session = bottle.request.environ.get('beaker.session')
             session['session_id'] = self.__userdb.get_user_session_id(username)
 
-    def __session_is_valid(self):
+    def session_is_valid(self):
         session = bottle.request.environ.get('beaker.session')
         if 'session_id' not in session:
             return False
         return self.__userdb.is_valid_session_id(session['session_id'])
 
     def __index(self):
-        if self.__session_is_valid():
+        if self.session_is_valid():
             return Server.APP_HTML
         else:
             return Server.LOGIN_HTML
@@ -157,8 +158,19 @@ class Server(SessionMiddleware):
         static_root_path = os.path.join(Server.ROOT_PATH, "client/")
         return static_file(filename, root=static_root_path)
 
+    def get_song(self, song_path: str):
+        if not self.session_is_valid():
+            response.status = 403
+            return
+        path_to_song = self.__taglist.get_absolute_song_path(song_path)
+        if path_to_song is None:
+            response.status = 404
+        else:
+            response.status = 200
+            return static_file(song_path, root=self.__taglist.audio_folder)
+
     def __search(self):
-        if self.__session_is_valid():
+        if self.session_is_valid():
             artist = request.query.artist or None
             album = request.query.album or None
             title = request.query.title or None
@@ -167,7 +179,7 @@ class Server(SessionMiddleware):
             response.status = "401 Login First"
 
     def __library(self):
-        if self.__session_is_valid():
-            return json.dumps(self.__taglist.tag_hierarchy)
+        if self.session_is_valid():
+            return json.dumps(self.__taglist.hierarchy)
         else:
             response.status = "401 Login First"
