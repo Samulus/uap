@@ -19,7 +19,7 @@ from bottle import static_file, request, response
 
 from src.taglist import TagList
 from src.userdb import UserDB
-from src.validation import username_is_valid_length, password_is_valid_length
+from src.validation import string_is_valid_length
 
 
 class Server(SessionMiddleware):
@@ -128,9 +128,9 @@ class Server(SessionMiddleware):
 
         # avoid signing up users with username
         # and passwords that contain invalid lengths
-        elif (not password_is_valid_length(password, 8, 512)
-              or not username_is_valid_length(username, 1, 32)):
-            response.status = ('400 Password must be between 8 and 512 chars'
+        elif (not string_is_valid_length(password, min_len=8, max_len=512)
+              or not string_is_valid_length(username, min_len=1, max_len=32)):
+            response.status = ('400 Password must be 8 to 512 chars'
                                'Username must be between 1 and 32 chars')
             return
 
@@ -154,11 +154,8 @@ class Server(SessionMiddleware):
             return Server.LOGIN_HTML
 
     def __static_file(self, filename: str):
-        if self.__session_is_valid():
-            static_root_path = os.path.join(Server.ROOT_PATH, "client/")
-            return static_file(filename, root=static_root_path)
-        else:
-            response.status = "401 Login First"
+        static_root_path = os.path.join(Server.ROOT_PATH, "client/")
+        return static_file(filename, root=static_root_path)
 
     def __search(self):
         if self.__session_is_valid():

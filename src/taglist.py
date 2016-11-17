@@ -9,12 +9,6 @@
 #   either accept this and cache the database or write a faster
 #   solution loading all of the DESIRED_TAGS from the music
 #   library.
-#
-#   TODO: The module is including the absolute path that the music file
-#   was found at as part of the "filepath" key but this is a security risk
-#   and extraneous information that can be recalculated server side anyway.
-#   Modify the __construct_tag_list method to only include relative paths
-#   in its output.
 
 
 import json
@@ -36,8 +30,8 @@ class TagList:
 
         # raise exception if parameters are used incorrectly
         if (audio_directory is None and use_json_path is None or
-                        audio_directory is not None and use_json_path is not None):
-            raise ValueError("taglist.py: Specify an audio directory OR a json tag file")
+           audio_directory is not None and use_json_path is not None):
+            raise ValueError("Specify an audio directory OR a json tag file")
 
         # use path to offline json file instead of reloading audio files from directory
         if use_json_path is not None:
@@ -78,7 +72,7 @@ class TagList:
             # add title tag to existing album
             if artist in self.tag_hierarchy and album in self.tag_hierarchy[artist] and title not in \
                     self.tag_hierarchy[artist][album]:
-                self.tag_hierarchy[artist][album][title] = {tag_type: tag_value for tag_type, tag_value in tag.items()
+                self.tag_hierarchy[artist][album][title] = {tag_type: tag_value for tag_type, tag_value in tag.items()   # H
                                                             if tag_type not in tags_to_omit_per_file}
 
     def dump_to_json_file(self, filepath: str):

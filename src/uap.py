@@ -10,19 +10,12 @@
 
 from bottle import route, run, static_file, template
 from sys import argv
-from taglist import TagList
-import json
+from src.taglist import TagList
 
 tag_list = None
 
-
-@route("/api/library")
-def library():
-    return json.dumps(tag_list.get_tags())
-
-
-def usage(argv):
-    print(""" Usage: {0} [Absolute Path To Music Directory]. """.format(argv[0]))
+def usage(av):
+    print(""" Usage: {0} [abs path to audio folder]. """.format(av[0]))
 
 
 if __name__ == '__main__':
