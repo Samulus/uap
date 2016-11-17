@@ -33,8 +33,8 @@ class UserDB:
                    'session_id': None
                    }
 
-    def __init__(self, db_path=DB_PATH, use_debug_db=False):
-        if use_debug_db:
+    def __init__(self, db_path=DB_PATH, ram_db=False):
+        if ram_db:
             self.__database = TinyDB(storage=MemoryStorage)
         else:
             self.__database = TinyDB(db_path)
@@ -78,6 +78,9 @@ class UserDB:
         user = self.find_user(username)
         if not user:
             return False
+
+        # TODO verify that the users knows the old password to change
+        # the new password
 
         # change the user's password and reset their session_id
         # they will have to log back in
