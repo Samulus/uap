@@ -97,5 +97,4 @@ uap_cookies/
 # database files
 /src/database/users.json
 /src/database/session.json
-/src/database/musicfiles.json
-/src/database/tags.json
+/src/database/taglist.json
