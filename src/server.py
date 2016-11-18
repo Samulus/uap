@@ -21,16 +21,25 @@ from src.taglist import TagList
 from src.userdb import UserDB
 from src.validation import string_is_valid_length
 
+ROOT_PATH = os.path.realpath(os.path.join(__file__, ".."))
+VALID_SEARCH_TYPES = ("artist", "album", "title")
+
+
+def get_app_html():
+    with open(os.path.join(ROOT_PATH, "client/index.html"), "r") \
+            as app_html:
+        return app_html.read()
+
+
+def get_login_html():
+    with open(os.path.join(ROOT_PATH, "client/login.html"), "r") \
+            as login_html:
+        return login_html.read()
+
 
 class Server(SessionMiddleware):
-    ROOT_PATH = os.path.realpath(os.path.join(__file__, ".."))
-    VALID_SEARCH_TYPES = ("artist", "album", "title")
-
-    with open(os.path.join(ROOT_PATH, "client/index.html"), "r") as app_html:
-        APP_HTML = app_html.read()
-
-    with open(os.path.join(ROOT_PATH, "client/login.html"), "r") as login_html:
-        LOGIN_HTML = login_html.read()
+    APP_HTML = get_app_html()
+    LOGIN_HTML = get_login_html()
 
     session_opts = {
         'session.type': 'memory',
@@ -74,7 +83,7 @@ class Server(SessionMiddleware):
         bottle.route("/api/library", "GET", self.__library)
         bottle.route("/api/library/", "GET", self.__library)
 
-        bottle.route("/api/song/:song_path", "GET", self.get_song)
+        bottle.route("/api/song/<song_path:path>", "GET", self.get_song)
 
     def start(self):
         bottle.run(app=self,
@@ -102,7 +111,7 @@ class Server(SessionMiddleware):
 
         # no such user, bad password -> notify user of bad request
         if not (self.__userdb.find_user(username) and
-                self.__userdb.log_user_in(username, password)):
+                    self.__userdb.log_user_in(username, password)):
             response.status = '401 Bad Password or Non-Existent Account'
             return
 
@@ -144,21 +153,31 @@ class Server(SessionMiddleware):
 
     def session_is_valid(self):
         session = bottle.request.environ.get('beaker.session')
+        if not self.__login_required:
+            return True
         if 'session_id' not in session:
             return False
         return self.__userdb.is_valid_session_id(session['session_id'])
 
     def __index(self):
         if self.session_is_valid():
-            return Server.APP_HTML
+            if not self.__debug:
+                return Server.APP_HTML
+            else:
+                return get_app_html()
         else:
-            return Server.LOGIN_HTML
+            if not self.__debug:
+                return Server.LOGIN_HTML
+            else:
+                return get_login_html()
 
     def __static_file(self, filename: str):
-        static_root_path = os.path.join(Server.ROOT_PATH, "client/")
+        static_root_path = os.path.join(ROOT_PATH, "client/")
         return static_file(filename, root=static_root_path)
 
     def get_song(self, song_path: str):
+        print(song_path)
+        return static_file(song_path, root=self.__taglist.audio_folder)
         if not self.session_is_valid():
             response.status = 403
             return
