@@ -12,6 +12,7 @@
         <title>uap</title>
         <link rel="stylesheet" href="css/layout.css">
         <link rel="stylesheet" href="css/vital.min.css">
+        <link rel="stylesheet" href="css/font-awesome-4.7.0/css/font-awesome.min.css">
     </head>
 
     <body>
@@ -51,7 +52,7 @@
                         <td>{{track.artist}}</td>
                         <td>{{track.album}}</td>
                         <td>{{track.title}}</td>
-                        <td><button class="btn small" v-on:click="play(i)">Play</button></td>
+                        <td><button class="btn small" v-on:click="play(i)"><i class="fa fa-play-circle"></i></button></td>
                         <td><button class="btn small" v-on:click="remove(i)">Remove</button></td>
                     </tr>
                 </tbody>
@@ -62,7 +63,7 @@
 
     <template id="artists-view">
         <div>
-            <h1>Artists</h1>
+            <h1><i class="fa fa-user fa-fw"></i>Artists</h1>
             <div class="autogrid">
                 <router-link
                         v-for="(_, artist) in library"
@@ -140,7 +141,7 @@
         <nav-component></nav-component>
         <now-playing v-if="audio_playing"></now-playing>
         <keep-alive>
-            <router-view></router-view>
+            <router-view transition="fade"></router-view>
         </keep-alive>
     </div>
 
