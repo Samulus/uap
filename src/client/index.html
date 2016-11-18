@@ -51,6 +51,7 @@
                         <td>{{track.artist}}</td>
                         <td>{{track.album}}</td>
                         <td>{{track.title}}</td>
+                        <td><button class="btn small" v-on:click="play(i)">Play</button></td>
                         <td><button class="btn small" v-on:click="remove(i)">Remove</button></td>
                     </tr>
                 </tbody>
@@ -128,8 +129,16 @@
         <h1>Genre</h1>
     </template>
 
+    <template id="now-playing">
+        <h3>This is an example of speex, an audio codec</h3>
+    </template>
+
+    <now-playing>
+    </now-playing>
+
     <div id="app">
         <nav-component></nav-component>
+        <now-playing v-if="audio_playing"></now-playing>
         <keep-alive>
             <router-view></router-view>
         </keep-alive>
@@ -139,6 +148,7 @@
     <script src="js/lib/vue-router.min.js"></script>
     <script src="js/lib/vue-resource.min.js"></script>
     <script src="js/lib/js.cookie.js"></script>
+    <script src="js/lib/howler.js"></script>
     <script src="js/lib/vuex.min.js"></script>
     <script>Vue.config.devtools = true;</script>
     <script src="js/store.js"></script>

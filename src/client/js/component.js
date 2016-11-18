@@ -80,7 +80,8 @@ Vue.component("track-album-view", {
         enqueue: function(title) {
             var artist = this.$route.params.artist;
             var album = this.$route.params.album;
-            this.$store.commit("add_to_queue", {"artist": artist, "album": album, "title": title});
+            this.$store.commit("add_to_queue",
+            {"artist": artist, "album": album, "title": title});
         }
     },
 
@@ -102,11 +103,15 @@ Vue.component("track-album-view", {
 
 Vue.component('nav-component', { template: "#nav-component" });
 Vue.component('genre-view', {template: "#genre-view"});
+Vue.component('now-playing', { template: "#now-playing" });
 
 Vue.component('song-queue', {
     template: "#song-queue",
     store: store,
     methods: {
+        play: function(i) {
+            this.$store.commit("start_playing", i)
+        },
         remove: function(i) {
             this.$store.commit("remove_track_index", i);
         }

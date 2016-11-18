@@ -18,5 +18,11 @@ const router = new VueRouter({routes: routes});
 
 const app = new Vue({
     el: '#app',
+    store: store,
+    computed: {
+        audio_playing: function() {
+            return store.state.audio_playing;
+        }
+    },
     router: router
 });
