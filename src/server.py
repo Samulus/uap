@@ -178,6 +178,8 @@ class Server(SessionMiddleware):
         return static_file(filename, root=static_root_path)
 
     def get_song(self, song_path: str):
+        # TODO: actually verify that the song_path the user is requesting
+        # is in the database so that we don't just hand them any url
         print(song_path)
         return static_file(song_path, root=self.__taglist.audio_folder)
         if not self.session_is_valid():
