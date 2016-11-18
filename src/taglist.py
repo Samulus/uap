@@ -10,6 +10,10 @@
 #   solution loading all of the DESIRED_TAGS from the music
 #   library.
 
+#   TODO: Modify this module so that it actually saves the
+#   the users library offline so that they can load it instead of
+#   automatically reloading everything constantly.
+
 
 from tinydb import TinyDB, Query
 from tinydb.storages import MemoryStorage

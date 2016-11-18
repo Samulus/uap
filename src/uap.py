@@ -8,21 +8,17 @@
 #   everytime they want to run the server.
    
 
-from bottle import route, run, static_file, template
-from sys import argv
 from src.taglist import TagList
-
-tag_list = None
-
-def usage(av):
-    print(""" Usage: {0} [abs path to audio folder]. """.format(av[0]))
-
+from src.server import Server
+from src.userdb import UserDB
 
 if __name__ == '__main__':
-    if len(argv) != 2:
-        usage(argv)
-        exit(1)
-    print("Loading music library... this may take a while")
-    tag_list = TagList(argv[1])
-    print("Serving api on port 8080...")
-    run(reloader=True, debug=True, port=8080)
+    server = Server(
+        host='127.0.0.1',
+        taglist=TagList("/home/sam/music/"),
+        userdb=UserDB(),
+        debug=True,
+        reloader=False,
+        login_required=False,
+    )
+    server.start()
