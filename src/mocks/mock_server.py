@@ -38,7 +38,7 @@ def get_song(self, song_path: str):
         response.status = 403
 
 
-def get_library(self):
+def _get_library(self):
     if self.session_is_valid():
         response.status = 200
         with open(MOCK_LIBRARY_HIERARCHY, "r") as library_hierarchy:
@@ -49,7 +49,7 @@ def get_library(self):
 
 if __name__ == '__main__':
     with mock.patch('src.server.Server.get_song', get_song), \
-         mock.patch('src.server.Server.get_library', get_library):
+         mock.patch('src.server.Server._get_library', _get_library):
         server = Server(
             taglist=None,
             userdb=UserDB(ram_db=True),
