@@ -2,39 +2,54 @@
     component.js
     Author: Samuel Vargas
     Date: 10/31/2016
+
+    Please note that the order the components are declared in
+    this file should match the order that the components are
+    declared in index.html. This will make it easier to look
+    up components and spend less time hunting things down.
+
+    Additionally the following naming scheme for elements
+    and components is used:
+
+    Anything that is a component (i.e. doesn't represent an
+    entirely different page in the application) should have the
+    name <foo>-<bar>-component.
+
+    Anything that is a view (i.e. represents a specific view
+    like Artists page, search page, etc) is a <foo>-<bar>-<view>
+
+    Every component or view should have a
+    <template id='<foo>-<bar>-<view|component>'></template>
+    tag that corresponds to it
+
+    If you add another component that should be routable
+    make sure you update it and add an entry for it
+    in route.js too!
 */
 
-Vue.http.options.emulateJSON = true;
-
-Vue.component('signout-component', {
-    template: "#signout-component",
-    methods: {
-        signout: function(event) {
-            event.preventDefault();
-            Vue.http.post('api/logout', {
-                'session_id': Cookies.get('beaker.session.id')
-            }).then(
-                function success(response) {
-                    // VERY gross
-                    window.location.href = "../../"
-                },
-                function failure(response) {
-                    alert("Could not sign out, try again later.");
-                    }
-                );
-            }
-        }
+Vue.component('nav-component', {
+    template: "#nav-component"
 });
 
-Vue.component('refresh-library', {
-    template: "#refresh-library",
+Vue.component('song-queue-view', {
+    template: "#song-queue-view",
     store: store,
     methods: {
-        refresh_library: function() {
-            this.$store.commit("refresh_library");
+        play: function(i) {
+            this.$store.commit("start_playing", i)
+        },
+        remove: function(i) {
+            this.$store.commit("remove_track_index", i);
         }
+    },
+
+    computed: {
+        get_tracks: function() {
+            return store.state.song_queue;
+        },
+
     }
-})
+});
 
 Vue.component('artists-view', {
     template: "#artists-view",
@@ -101,26 +116,50 @@ Vue.component("track-album-view", {
     }
 });
 
-Vue.component('nav-component', { template: "#nav-component" });
-Vue.component('genre-view', {template: "#genre-view"});
-Vue.component('now-playing', { template: "#now-playing" });
+Vue.component('genre-view', {
+    template: "#genre-view"
+});
 
-Vue.component('song-queue', {
-    template: "#song-queue",
+
+Vue.component('signout-component', {
+    template: "#signout-component",
+    methods: {
+        signout: function(event) {
+            Vue.http.options.emulateJSON = true;
+            event.preventDefault();
+            Vue.http.post('api/logout', {
+                'session_id': Cookies.get('beaker.session.id')
+            }).then(
+                function success(response) {
+                    /* basically force a page reload */
+                    window.location.href = "../../"
+                },
+                function failure(response) {
+                    alert("Could not sign out, try again later.");
+                    }
+                );
+            }
+        }
+});
+
+Vue.component('refresh-library-component', {
+    template: "#refresh-library-component",
     store: store,
     methods: {
-        play: function(i) {
-            this.$store.commit("start_playing", i)
-        },
-        remove: function(i) {
-            this.$store.commit("remove_track_index", i);
+        refresh_library: function() {
+            this.$store.commit("refresh_library");
         }
-    },
-
-    computed: {
-        get_tracks: function() {
-            return store.state.song_queue;
-        },
-
     }
+})
+
+Vue.component('now-playing-component', { template: "#now-playing-component" });
+
+Vue.component('settings-view', {
+    template: "#settings-view"
 });
+
+
+
+
+
+
