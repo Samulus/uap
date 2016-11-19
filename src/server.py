@@ -82,8 +82,8 @@ class Server(SessionMiddleware):
         # restful API
         bottle.route("/api/search", "GET", self.__search)
         bottle.route("/api/search/", "GET", self.__search)
-        bottle.route("/api/library", "GET", self.__library)
-        bottle.route("/api/library/", "GET", self.__library)
+        bottle.route("/api/library", "GET", self.get_library)
+        bottle.route("/api/library/", "GET", self.get_library)
 
         bottle.route("/api/song/<song_path:path>", "GET", self.get_song)
 
@@ -201,7 +201,7 @@ class Server(SessionMiddleware):
         else:
             response.status = "401 Login First"
 
-    def __library(self):
+    def get_library(self):
         if self.session_is_valid():
             return json.dumps(self.__taglist.hierarchy)
         else:
