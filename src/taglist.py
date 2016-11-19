@@ -52,19 +52,14 @@ class TagList:
     DESIRED_TAGS = ("title", "artist", "album", "album artist",
                     "year", "tracknumber", "genre")
 
-    def __init__(self, audio_folder: str, ram_db=False):
-        self.linear = []
-        self.hierarchy = OrderedDict()
+    def __init__(self, audio_folder: str):
+        self.linear_song_list = []
+        self.hierarchy_song_dict = OrderedDict()
         self.audio_folder = audio_folder
 
         if not audio_folder:
             raise ValueError("You must specify a directory to parse"
                              "audio files from.")
-
-        if ram_db:
-            self.__database = TinyDB(storage=MemoryStorage)
-        else:
-            self.__database = TinyDB(TagList.DB_PATH)
 
         self.load_from_directory(audio_folder)
 
@@ -78,13 +73,9 @@ class TagList:
                              directory.
         """
 
-        # ghetto: purge the table before reloading the database
-        # back into the memory object.
-        self.__database.purge_table('_default')
-
         # generate a list of tags
         for filepath in get_files_with_ext(audio_folder, self.SUPPORTED_EXT):
-            self.linear.append({})
+            self.linear_song_list.append({})
             audiofile = None
             try:
                 audiofile = mutagen.File(os.path.join(audio_folder, filepath),
@@ -99,33 +90,34 @@ class TagList:
                 # copy all of the desired tags from the file into the tag
                 for desired in TagList.DESIRED_TAGS:
                     if key.lower() == desired:
-                        self.linear[-1][key.lower()] = value
+                        self.linear_song_list[-1][key.lower()] = value
                 # record the relative filepath for this audiofile
-                self.linear[-1]["filepath"] = filepath
+                self.linear_song_list[-1]["filepath"] = filepath
 
-        for tag in self.linear:
+        for tag in self.linear_song_list:
             artist = tag["artist"][0] if "artist" in tag else None
             album = tag["album"][0] if "album" in tag else None
             title = tag["title"][0] if "title" in tag else None
             tags_to_omit_per_file = ("artist", "album", "title")
 
             # add {'artist' : {}} if not found yet
-            if artist and artist not in self.hierarchy:
-                self.hierarchy[artist] = OrderedDict()
+            if artist and artist not in self.hierarchy_song_dict:
+                self.hierarchy_song_dict[artist] = OrderedDict()
 
             # add {'artist': {'album': {}}}
-            if artist and artist in self.hierarchy and \
-               album and album not in self.hierarchy[artist]:
-                self.hierarchy[artist][album] = OrderedDict()
+            if artist and artist in self.hierarchy_song_dict and \
+                    album and album not in self.hierarchy_song_dict[artist]:
+                self.hierarchy_song_dict[artist][album] = OrderedDict()
 
             # add {'artist': {'album': {'track 1': {}}}}
-            if artist and artist in self.hierarchy and \
-               album and album in self.hierarchy[artist] and \
-               title and title not in self.hierarchy[artist][album]:
-                    self.hierarchy[artist][album][title] = \
-                        {tag_type: tag_value
-                         for tag_type, tag_value in tag.items()
-                         if tag_type not in tags_to_omit_per_file}
+            if artist and artist in self.hierarchy_song_dict and \
+                    album and album in self.hierarchy_song_dict[artist] and \
+                    title and title not in \
+                    self.hierarchy_song_dict[artist][album]:
+                self.hierarchy_song_dict[artist][album][title] = \
+                    {tag_type: tag_value
+                     for tag_type, tag_value in tag.items()
+                     if tag_type not in tags_to_omit_per_file}
 
     def search(self, artist=None, album=None, title=None) -> List[str]:
         results = []
@@ -134,11 +126,11 @@ class TagList:
         hits_needed += 1 if album is not None else 0
         hits_needed += 1 if title is not None else 0
 
-        for tag in self.linear:
+        for tag in self.linear_song_list:
             hits = 0
             for tag_key, tag_value in tag.items():
                 if artist is not None and tag_key == "artist" and \
-                   artist.lower() in tag_value[0].lower():
+                                artist.lower() in tag_value[0].lower():
                     hits += 1
                 if album is not None and tag_key == "album" and \
                    album.lower() in tag_value[0].lower():
@@ -151,10 +143,8 @@ class TagList:
 
         return results
 
-    def get_absolute_song_path(self, song_path):
-        results = self.__database.search(Query().filepath == song_path)
-        assert len(results) < 2, \
-            "Two songs should not have the same filepath."
-        if len(results) == 1:
-            return join(self.audio_folder, results[0]['filepath'])
-        return None
+    def is_song_path_in_taglist(self, song_path):
+        for song in self.linear_song_list:
+            if 'filepath' in song and song['filepath'] == song_path:
+                return True
+        return False
