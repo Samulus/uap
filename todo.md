@@ -1,6 +1,7 @@
 # Project Dependencies
 * python3
-* [pytaglib](https://pypi.python.org/pypi/pytaglib)
+    * ...
+* [mutagen](https://pypi.python.org/pypi/mutagen)
     * For reading tags from audio files
 * [bottle.py](http://bottlepy.org/docs/dev/)
     * For serving HTML / json to the client 
@@ -9,9 +10,9 @@
 * [scrypt](https://pypi.python.org/pypi/scrypt/)
     * For hashing client passwords serverside for security purposes.
 * [tinydb](http://tinydb.readthedocs.io/en/latest/)
-    * For saving information about users, sessions, and the music library
+        * For saving information about users, sessions, and the music library
 
-# Useful Documentation Shortcuts 
+# Useful Documentation Shortcuts
 
 ## Helpful IDE Stuff
 * http://www.pydev.org/
