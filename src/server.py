@@ -110,8 +110,8 @@ class Server(SessionMiddleware):
         # restful API
         bottle.route("/api/search", "GET", self.__search)
         bottle.route("/api/search/", "GET", self.__search)
-        bottle.route("/api/library", "GET", self.get_library)
-        bottle.route("/api/library/", "GET", self.get_library)
+        bottle.route("/api/library", "GET", self._get_library)
+        bottle.route("/api/library/", "GET", self._get_library)
 
         bottle.route("/api/song/<song_path:path>", "GET", self.get_song)
 
@@ -206,19 +206,20 @@ class Server(SessionMiddleware):
         return static_file(filename, root=static_root_path)
 
     def get_song(self, song_path: str):
-        # TODO: actually verify that the song_path the user is requesting
-        # is in the database so that we don't just hand them any url
-        print(song_path)
-        return static_file(song_path, root=self.__taglist.audio_folder)
+        # log in before requesting a song
         if not self.session_is_valid():
             response.status = 403
             return
-        path_to_song = self.__taglist.get_absolute_song_path(song_path)
-        if path_to_song is None:
-            response.status = 404
-        else:
+
+        # verify the song they're requesting is a song and not a random file
+        if self.__taglist.is_song_path_in_taglist(song_path):
             response.status = 200
             return static_file(song_path, root=self.__taglist.audio_folder)
+
+        # if they ask for a path that has no song that corresponds to it
+        # then refuse
+        else:
+            response.status = "404 Couldn't find song " + song_path
 
     def __search(self):
         if self.session_is_valid():
@@ -229,8 +230,8 @@ class Server(SessionMiddleware):
         else:
             response.status = "401 Login First"
 
-    def get_library(self):
+    def _get_library(self):
         if self.session_is_valid():
-            return json.dumps(self.__taglist.hierarchy)
+            return json.dumps(self.__taglist.hierarchy_song_dict)
         else:
             response.status = "401 Login First"
