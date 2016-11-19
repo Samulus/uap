@@ -19,22 +19,50 @@ from bottle import static_file, request, response
 
 from src.taglist import TagList
 from src.userdb import UserDB
-from src.validation import string_is_valid_length
 
 ROOT_PATH = os.path.realpath(os.path.join(__file__, ".."))
 VALID_SEARCH_TYPES = ("artist", "album", "title")
 
 
-def get_app_html():
+def get_app_html() -> str:
+    """
+    Returns the client interface html to the caller
+
+    :returns: A string containing the client html.
+    """
     with open(os.path.join(ROOT_PATH, "client/index.html"), "r") \
             as app_html:
         return app_html.read()
 
 
-def get_login_html():
+def get_login_html() -> str:
+    """
+    Returns the login interface html to the caller
+
+    :returns: A string containing the login html.
+    """
     with open(os.path.join(ROOT_PATH, "client/login.html"), "r") \
             as login_html:
         return login_html.read()
+
+
+def string_is_valid_length(string: str, min_len: int, max_len: int) -> bool:
+    """
+    Checks if a string falls within a specified max / min length.
+
+    :param string: The string in question.
+    :param min_len: The maximum length the string should be.
+    :param max_len: The minimum length the string should be.
+    :returns: True if the string falls within the specified range, false
+             otherwise.
+    """
+    if max_len <= min_len or min_len >= max_len:
+        raise ValueError("min_len must be less than max_len")
+
+    if string is None:
+        raise ValueError("String cannot be None")
+
+    return min_len <= len(string) <= max_len
 
 
 class Server(SessionMiddleware):
@@ -43,7 +71,7 @@ class Server(SessionMiddleware):
 
     session_opts = {
         'session.type': 'memory',
-        'session.cookie_expires': 300,
+        'session.cookie_expires': False,
         'session.auto': True
     }
 

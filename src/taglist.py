@@ -4,30 +4,46 @@
 #   Author: Samuel Vargas
 #   Date: 10/29/2016
 #
-#   TODO: taglib.File(file_path).tag.items() is extremely slow,
-#   it takes about 10-15 seconds on my 26GB library. We should
-#   either accept this and cache the database or write a faster
-#   solution loading all of the DESIRED_TAGS from the music
-#   library.
+#   The taglist module accepts a path to a folder and uses os.walk + Mutagen
+#   to dynamically load all of the multimedia files that contain a supported
+#   media file extension ('.mp3', '.flac', '.ogg') etc.
 
-#   TODO: Modify this module so that it actually saves the
-#   the users library offline so that they can load it instead of
-#   automatically reloading everything constantly.
+#   Note that the TinyDB / offline saving functionality has been temporarily
+#   removed because writing an entire library to a json file is too slow.
+#   (I don't know what I expected). I'll be mitigating it to dataset (sqlite3
+#   wrapper) in the future.
 
-
-import os
 from collections import OrderedDict
 from os.path import realpath, join
-from typing import List
-
+from typing import List, Tuple
+import os
 import mutagen
-from tinydb import TinyDB, Query
-from tinydb.storages import MemoryStorage
-
-from src.util import get_files_with_ext
 
 
-# to delete everything: db.purge_table('_default')
+def get_files_with_ext(audio_folder: str, supported_ext: Tuple) -> List[str]:
+    """
+    Returns a list of relative paths to files in a given audio_directory
+    that end with one of the extensions in the supported_ext tuple.
+
+    :param audio_folder: The root folder to begin searching for files.
+                            Can be relative or absolute.
+    :param supported_ext:   A tuple containing desired file extensions
+                            e.g. ('.mp3', '.ogg', '.mp4', '.tar.xz').
+                            Ensure that you include the leading dot when
+                            specifying the extension type.
+
+    :return: A list of relative paths to files that have this extension.
+
+    """
+    audio_files = []
+    audio_folder = os.path.normpath(audio_folder)
+    for dir_name, _, file_list in os.walk(audio_folder):
+        for file_path in file_list:
+            if file_path.lower().endswith(supported_ext):
+                audio_files.append(
+                    os.path.relpath(os.path.join(dir_name, file_path),
+                                    audio_folder))
+    return audio_files
 
 
 class TagList:
