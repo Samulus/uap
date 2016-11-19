@@ -15,14 +15,16 @@
 #   automatically reloading everything constantly.
 
 
-from tinydb import TinyDB, Query
-from tinydb.storages import MemoryStorage
+import os
 from collections import OrderedDict
 from os.path import realpath, join
 from typing import List
+
+import mutagen
+from tinydb import TinyDB, Query
+from tinydb.storages import MemoryStorage
+
 from src.util import get_files_with_ext
-import taglib
-import os
 
 
 # to delete everything: db.purge_table('_default')
@@ -50,7 +52,6 @@ class TagList:
 
         self.load_from_directory(audio_folder)
 
-    # noinspection PyTypeChecker
     def load_from_directory(self, audio_folder: str):
         """
         Accepts a path to an audio_folder and then constructs a linear
@@ -68,8 +69,17 @@ class TagList:
         # generate a list of tags
         for filepath in get_files_with_ext(audio_folder, self.SUPPORTED_EXT):
             self.linear.append({})
-            audiofile = taglib.File(os.path.join(audio_folder, filepath))
-            for key, value in audiofile.tags.items():
+            audiofile = None
+            try:
+                audiofile = mutagen.File(os.path.join(audio_folder, filepath),
+                                         easy=True)
+            except mutagen.mp3.HeaderNotFoundError:
+                audiofile = None
+
+            if audiofile is None:
+                continue
+
+            for key, value in audiofile.items():
                 # copy all of the desired tags from the file into the tag
                 for desired in TagList.DESIRED_TAGS:
                     if key.lower() == desired:
@@ -84,18 +94,18 @@ class TagList:
             tags_to_omit_per_file = ("artist", "album", "title")
 
             # add {'artist' : {}} if not found yet
-            if artist not in self.hierarchy:
+            if artist and artist not in self.hierarchy:
                 self.hierarchy[artist] = OrderedDict()
 
             # add {'artist': {'album': {}}}
-            if artist in self.hierarchy and \
-               album not in self.hierarchy[artist]:
+            if artist and artist in self.hierarchy and \
+               album and album not in self.hierarchy[artist]:
                 self.hierarchy[artist][album] = OrderedDict()
 
             # add {'artist': {'album': {'track 1': {}}}}
-            if artist in self.hierarchy and \
-               album in self.hierarchy[artist] and \
-               title not in self.hierarchy[artist][album]:
+            if artist and artist in self.hierarchy and \
+               album and album in self.hierarchy[artist] and \
+               title and title not in self.hierarchy[artist][album]:
                     self.hierarchy[artist][album][title] = \
                         {tag_type: tag_value
                          for tag_type, tag_value in tag.items()
