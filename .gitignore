@@ -76,6 +76,9 @@ ENV/
 # uap_cookies
 uap_cookies/
 
+# uap config
+config.ini
+
 # database files
 /src/database/users.json
 /src/database/session.json
