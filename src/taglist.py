@@ -6,18 +6,30 @@
 #
 #   The taglist module accepts a path to a folder and uses os.walk + Mutagen
 #   to dynamically load all of the multimedia files that contain a supported
-#   media file extension ('.mp3', '.flac', '.ogg') etc.
+#   media file extension ('.mp3', '.flac', '.ogg') etc. It then stores those
+#   into two instance variables and consists of methods to search them.
 
-#   Note that the TinyDB / offline saving functionality has been temporarily
+#   An instance of this class is then used in the Server module every time the
+#   user requests an audio file (to verify that file actually exists) or to
+#   search for audio files that contain tags the users are searching for.
+
+#   Finally the self.linear_song_list and self.hierarchy_song_dict attributes
+#   can be used to iterate through the entire library or to browse by
+#   using a dict with a structure like: {"artist": "album": {"track" : {}}}
+
+#   NOTE: TinyDB / offline saving functionality has been temporarily
 #   removed because writing an entire library to a json file is too slow.
 #   (I don't know what I expected). I'll be mitigating it to dataset (sqlite3
-#   wrapper) in the future.
+#   wrapper) in the future. In the mean time this means that your entire music
+#   library will be reloaded every time. Mutagen is generally pretty fast
+#   though so it should not be much of a problem.
 
-import os
 from collections import OrderedDict
 from os.path import realpath, join, normpath
-from typing import List, Tuple
+from typing import Dict, List, Tuple
 
+import os
+import sys
 import mutagen
 
 
