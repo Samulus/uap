@@ -167,11 +167,11 @@ class UserDB:
     @staticmethod
     def __create_password(password=None, salt=None) -> str:
         if password is None or salt is None:
-            raise ValueError("Password and Salt cannot be none.")
+            raise ValueError("Password or Salt cannot be none.")
         return base64.encodebytes(scrypt.hash(password, salt)).decode('utf-8')
 
     @staticmethod
     def __decode_password(password=None, salt=None):
         if password is None or salt is None:
-            raise ValueError("Password and Salt cannot be none.")
+            raise ValueError("Password or Salt cannot be none.")
         return base64.decodebytes(password.encode('utf-8'))
