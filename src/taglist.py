@@ -99,8 +99,9 @@ class TagList:
             try:
                 audiofile = mutagen.File(os.path.join(audio_folder, filepath),
                                          easy=True)
-            except mutagen.mp3.HeaderNotFoundError:
+            except mutagen.MutagenError:
                 audiofile = None
+                print("Malformed tags: " + filepath, file=sys.stderr)
 
             if audiofile is None:
                 continue
