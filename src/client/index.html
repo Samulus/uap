@@ -48,16 +48,31 @@
         </div>
     </template>
 
+    <template id="queued-song-component">
+        <div>
+        </div>
+    </template>
 
     <template id="song-queue-view">
-        <div>
-            <ul id="song_queue_sortable">
-                <li v-for="(track, i) in get_tracks">
-                    <p>{{track.artist}}</p>
-                    <p>{{track.album}}</p>
-                    <p>{{track.title}}</p>
-                    <p><button class="btn small" v-on:click="play(i)"><i class="fa fa-play-circle"></i></button></p>
-                    <p><button class="btn small" v-on:click="remove(i)">Remove</button></p>
+        <div class="container-fluid">
+            <ul class="list-group" id="song_queue_sortable" v-sortable>
+                <li class="list-group-item" v-for="(track, i) in get_tracks">
+                    <!--
+                    <queued-song-component
+                            v-bind:artist="track.artist"
+                            v-bind:album="track.album"
+                            v-bind:title="track.title">
+                    </queued-song-component>
+                    -->
+                    <div class="song_queue_artist_name">{{track.artist}}</div>
+                    <div class="song_queue_album_name">{{track.album}}</div>
+                    <div class="song_queue_title_name">{{track.title}}</div>
+                    <button class="btn small no-outline" v-on:click="play(i)">
+                        <i class="fa fa-play-circle"></i>
+                    </button>
+                    <button class="btn small no-outline" v-on:click="remove(i)">
+                        <i class="fa fa-times"></i>
+                    </button>
                 </li>
             </ul>
         </div>

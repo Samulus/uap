@@ -1,12 +1,33 @@
 /*
     vital css overrides
 */
+
 input:hover, input:focus, select:hover, select:focus, textarea:hover, textarea:focus {
     border-color: #96C587;
 }
 
 /*
-    uap specific
+    queued-song-component
+*/
+
+.song_queue_artist_name {
+    font-size: 1.3em;
+}
+
+.song_queue_album_name {
+    font-size: 1em;
+    margin-top:-0.5em;
+    margin-left:1em;
+}
+
+.song_queue_title_name {
+    font-size: 1em;
+    margin-top:-0.5em;
+    margin-left:1.5em;
+}
+
+/*
+    general application css
 */
 
 .form-item {
