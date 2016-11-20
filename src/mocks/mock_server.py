@@ -7,7 +7,7 @@
 #   This is a mock implementation of the backend server api
 #   to enable testing of the server's API and the frontend client.
 #   At the moment it uses Samuel's library for test data and mocks
-#   out any request to 'api/song' (the get_flamenco method in Server)
+#   out any request to 'api/song' (the get_song method in Server)
 #   to always return the same sample flamenco song each time.
 
 #   You can use this module to test all logic on the client without
