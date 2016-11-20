@@ -2,23 +2,29 @@
 #  
 #   uap.py
 #   Author: Samuel Vargas
-
-#   TODO: introduce a configuration file so that users don't
-#   have to manually specify the path of their music library
-#   everytime they want to run the server.
-
+#   Date: 11/20/2016
 
 from src.server import Server
 from src.taglist import TagList
 from src.userdb import UserDB
+from src.config import load_settings_dict
 
 if __name__ == '__main__':
+
+    settings = load_settings_dict()
+    if settings is None:
+        print("config.ini was not found and an example one was "
+              "generated for you. Please modify it and rerun the "
+              "program.")
+        exit(0)
+
     server = Server(
-        host='127.0.0.1',
-        taglist=TagList("D:\music"), # change this to your music folder
+        host=settings['host'],
+        taglist=TagList(settings['music_folder']),
         userdb=UserDB(),
-        debug=True,
-        reloader=False,
-        login_required=True,
+        debug=settings['debug'],
+        reloader=settings['reloader'],
+        login_required=settings['login_required'],
     )
+
     server.start()
