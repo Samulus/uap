@@ -48,19 +48,25 @@ def get_files_with_ext(audio_folder: str, supported_ext: Tuple) -> List[str]:
 
 
 class TagList:
-    DB_PATH = realpath(join(__file__, "..", "database/taglist.json"))
     SUPPORTED_EXT = (".mp3", ".ogg", ".flac")
     DESIRED_TAGS = ("title", "artist", "album", "album artist",
                     "year", "tracknumber", "genre")
 
     def __init__(self, audio_folder: str):
+        """
+        Create a new instance of a TagList
+
+        :param audio_folder: The music folder to parse audio files from.
+        """
         self.linear_song_list = []
         self.hierarchy_song_dict = OrderedDict()
         self.audio_folder = audio_folder
 
         if not audio_folder:
-            raise ValueError("You must specify a directory to parse"
-                             "audio files from.")
+            raise ValueError("You must specify a folder to parse"
+                             "audio files from.\n"
+                             "Remember to modify config.ini and add your "
+                             "music folder.")
 
         self.load_from_directory(audio_folder)
 
@@ -120,7 +126,23 @@ class TagList:
                      for tag_type, tag_value in tag.items()
                      if tag_type not in tags_to_omit_per_file}
 
-    def search(self, artist=None, album=None, title=None) -> List[str]:
+    def search(self, artist=None, album=None, title=None) -> List[Dict]:
+        """
+        Searches the taglist for audio files that contain (substring search)
+        the specified tags. The type of search performed is a logical AND,
+        meaning that if call this function with search(artist="Death", album=
+        "Money") it will only return results that match the artist AND album.
+
+        :TODO: Eventually modify this function so that it accepts **kwargs
+               so that you can search for any tag and not just the current
+               three.
+
+        :param artist: The artist to search for
+        :param album: The album to search for
+        :param title: The title to search for
+        :return: A list containing results, an empty list if no results
+                 are found.
+        """
         results = []
 
         hits_needed = 1 if artist is not None else 0
@@ -134,17 +156,28 @@ class TagList:
                                 artist.lower() in tag_value[0].lower():
                     hits += 1
                 if album is not None and tag_key == "album" and \
-                   album.lower() in tag_value[0].lower():
+                                album.lower() in tag_value[0].lower():
                     hits += 1
                 if title is not None and tag_key == "title" and \
-                   title.lower() in tag_value[0].lower():
+                                title.lower() in tag_value[0].lower():
                     hits += 1
             if hits == hits_needed:
                 results.append(tag)
 
         return results
 
-    def is_song_path_in_taglist(self, song_path):
+    def is_song_path_in_taglist(self, song_path: str) -> bool:
+        """
+        Check to see if a song_path has a corresponding song_path in the
+        taglist. Use this function to validate user input when they request
+        a song. It will prevent them from downloading any random file in
+        the music folder.
+
+        :param song_path: Relative path to an audio file in the music folder
+                          to validate.
+        :return: True if the song_path corresponds to a valid audio file,
+                 False otherwise.
+        """
         for song in self.linear_song_list:
             if 'filepath' in song and song['filepath'] == normpath(song_path):
                 return True
