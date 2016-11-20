@@ -51,28 +51,15 @@
 
     <template id="song-queue-view">
         <div>
-            <ul>
+            <ul id="song_queue_sortable">
+                <li v-for="(track, i) in get_tracks">
+                    <p>{{track.artist}}</p>
+                    <p>{{track.album}}</p>
+                    <p>{{track.title}}</p>
+                    <p><button class="btn small" v-on:click="play(i)"><i class="fa fa-play-circle"></i></button></p>
+                    <p><button class="btn small" v-on:click="remove(i)">Remove</button></p>
+                </li>
             </ul>
-
-            <table>
-                <thead>
-                <tr>
-                    <th>Artist</th>
-                    <th>Album</th>
-                    <th>Title</th>
-                    <th>Actions</th>
-                </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="(track, i) in get_tracks">
-                        <td>{{track.artist}}</td>
-                        <td>{{track.album}}</td>
-                        <td>{{track.title}}</td>
-                        <td><button class="btn small" v-on:click="play(i)"><i class="fa fa-play-circle"></i></button></td>
-                        <td><button class="btn small" v-on:click="remove(i)">Remove</button></td>
-                    </tr>
-                </tbody>
-            </table>
         </div>
     </template>
 
