@@ -13,10 +13,11 @@
 #   (I don't know what I expected). I'll be mitigating it to dataset (sqlite3
 #   wrapper) in the future.
 
-from collections import OrderedDict
-from os.path import realpath, join
-from typing import List, Tuple
 import os
+from collections import OrderedDict
+from os.path import realpath, join, normpath
+from typing import List, Tuple
+
 import mutagen
 
 
@@ -145,6 +146,6 @@ class TagList:
 
     def is_song_path_in_taglist(self, song_path):
         for song in self.linear_song_list:
-            if 'filepath' in song and song['filepath'] == song_path:
+            if 'filepath' in song and song['filepath'] == normpath(song_path):
                 return True
         return False
