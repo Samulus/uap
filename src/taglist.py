@@ -94,8 +94,9 @@ class TagList:
 
         # generate a list of tags
         for filepath in get_files_with_ext(audio_folder, self.SUPPORTED_EXT):
-            self.linear_song_list.append({})
-            audiofile = None
+
+            # avoid crashing for malformed audio files, just ignore them,
+            # warn the user, and refuse to add them to the taglist
             try:
                 audiofile = mutagen.File(os.path.join(audio_folder, filepath),
                                          easy=True)
@@ -105,6 +106,9 @@ class TagList:
 
             if audiofile is None:
                 continue
+
+            # copy keys / values into self.linear_song_list
+            self.linear_song_list.append({})
 
             for key, value in audiofile.items():
                 # copy all of the desired tags from the file into the tag
