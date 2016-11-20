@@ -27,13 +27,27 @@
     in route.js too!
 */
 
+/*
+    Views
+*/
+
 Vue.component('nav-component', {
     template: "#nav-component"
+});
+
+Vue.component('queued-song-component', {
+    template: "#queued-song-component",
+    props: ['artist', 'album', 'title']
 });
 
 Vue.component('song-queue-view', {
     template: "#song-queue-view",
     store: store,
+    watch: {
+        '$route': function(route) {
+           /* TODO */
+        }
+    },
     methods: {
         play: function(i) {
             this.$store.commit("start_playing", i)
