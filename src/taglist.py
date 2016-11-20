@@ -86,7 +86,7 @@ class TagList:
         """
         Accepts a path to an audio_folder and then constructs a linear
         list of dicts and an OrderedDict in a hierarchy format in
-        self.linear and self.hierarchy
+        self.linear_song_list and self.hierarchy_song_dict
 
         :param audio_folder: An absolute or relative path to a music
                              directory.
