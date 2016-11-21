@@ -18,7 +18,7 @@ import copy
 import os
 from os.path import realpath, join
 
-import scrypt
+import bcrypt
 from tinydb import TinyDB, Query
 from tinydb.storages import MemoryStorage
 
@@ -115,7 +115,7 @@ class UserDB:
             return False
 
         # determine if their password is correct
-        password_to_verify = scrypt.hash(password_to_verify, user['salt'])
+        password_to_verify = bcrypt.hashpw(password_to_verify, user['salt'])
         known_good_password = UserDB.__decode_password(user['password'],
                                                        user['salt'])
 
@@ -168,7 +168,7 @@ class UserDB:
     def __create_password(password=None, salt=None) -> str:
         if password is None or salt is None:
             raise ValueError("Password or Salt cannot be none.")
-        return base64.encodebytes(scrypt.hash(password, salt)).decode('utf-8')
+        return base64.encodebytes(bcrypt.hashpw(password, salt)).decode('utf-8')
 
     @staticmethod
     def __decode_password(password=None, salt=None):
