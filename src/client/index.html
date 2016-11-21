@@ -17,49 +17,66 @@
 
     <body>
 
-    <template id="refresh-library">
-        <a class="btn round no-outline" v-on:click="refresh_library()">Refresh Library</a>
-    </template>
 
     <template id="nav-component">
         <div class="autogrid tabs-block">
-            <div class="col"><router-link class="col" to='/queue'   exact>Queue</router-link></div>
-            <div class="col"><router-link class="col" to='/artists' exact>Artists</router-link></div>
-            <div class="col"><router-link class="col" to='/albums'  exact>Albums</router-link></div>
-            <div class="col"><signout-component></signout-component></div>
-            <div class="col"><refresh-library></refresh-library></div>
+            <div class="col">
+                <router-link class="col" to='/queue' exact>
+                    <i class="fa fa-list"></i> Queue
+                </router-link>
+            </div>
+            <div class="col">
+                <router-link class="col" to='/artists' exact>
+                    <i class="fa fa-users"></i> Artists
+                </router-link>
+            </div>
+            <div class="col">
+                <router-link class="col" to='/albums' exact>
+                    <i class="fa fa-life-ring"></i> Albums
+                </router-link>
+            </div>
+            <div class="col">
+                <router-link class="col" to='/search' exact>
+                    <i class="fa fa-search"></i> Search
+                </router-link>
+            </div>
+            <div class="col">
+                <router-link class="col" to='/settings' exact>
+                    <i class="fa fa-wrench"></i> Settings
+                </router-link>
+            </div>
         </div>
     </template>
 
-    <template id="signout-component">
-        <button class="btn round no-outline red" v-on:click="signout($event)">Sign Out</button>
-    </template>
-
-    <template id="song-queue">
+    <template id="queued-song-component">
         <div>
-            <h1>Song Queue</h1>
-            <table>
-                <thead>
-                <tr>
-                    <th>Artist</th>
-                    <th>Album</th>
-                    <th>Title</th>
-                    <th>Actions</th>
-                </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="(track, i) in get_tracks">
-                        <td>{{track.artist}}</td>
-                        <td>{{track.album}}</td>
-                        <td>{{track.title}}</td>
-                        <td><button class="btn small" v-on:click="play(i)"><i class="fa fa-play-circle"></i></button></td>
-                        <td><button class="btn small" v-on:click="remove(i)">Remove</button></td>
-                    </tr>
-                </tbody>
-            </table>
         </div>
     </template>
 
+    <template id="song-queue-view">
+        <div class="container-fluid">
+            <ul class="list-group" id="song_queue_sortable" v-sortable>
+                <li class="list-group-item" v-for="(track, i) in get_tracks">
+                    <!--
+                    <queued-song-component
+                            v-bind:artist="track.artist"
+                            v-bind:album="track.album"
+                            v-bind:title="track.title">
+                    </queued-song-component>
+                    -->
+                    <div class="song_queue_artist_name">{{track.artist}}</div>
+                    <div class="song_queue_album_name">{{track.album}}</div>
+                    <div class="song_queue_title_name">{{track.title}}</div>
+                    <button class="btn small no-outline" v-on:click="play(i)">
+                        <i class="fa fa-play-circle"></i>
+                    </button>
+                    <button class="btn small no-outline" v-on:click="remove(i)">
+                        <i class="fa fa-times"></i>
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </template>
 
     <template id="artists-view">
         <div>
@@ -130,16 +147,36 @@
         <h1>Genre</h1>
     </template>
 
-    <template id="now-playing">
-        <h3>This is an example of speex, an audio codec</h3>
+    <template id="signout-component">
+        <button class="btn round no-outline red" v-on:click="signout($event)">Sign Out</button>
     </template>
 
-    <now-playing>
-    </now-playing>
+    <template id="refresh-library-component">
+        <a class="btn round no-outline" v-on:click="refresh_library()">Refresh Library</a>
+    </template>
+
+    <template id='settings-view'>
+        <div>
+            <signout-component></signout-component>
+            <refresh-library-component></refresh-library-component>
+        </div>
+    </template>
+
+    <template id="now-playing-component">
+        <div>
+            <div class="audio-player">
+                <h3><i class="fa fa-backward"></i>
+                <i class="fa fa-play-circle"></i>
+                <i class="fa fa-forward"></i></h3>
+            </div>
+        </div>
+    </template>
 
     <div id="app">
         <nav-component></nav-component>
-        <now-playing v-if="audio_playing"></now-playing>
+        <now-playing-component>
+        </now-playing-component>
+        <!--<now-playing v-if="audio_playing"></now-playing>-->
         <keep-alive>
             <router-view transition="fade"></router-view>
         </keep-alive>
@@ -148,6 +185,8 @@
     <script src="js/lib/vue.js"></script>
     <script src="js/lib/vue-router.min.js"></script>
     <script src="js/lib/vue-resource.min.js"></script>
+    <script src="js/lib/sortable.js"></script>
+    <script src="js/lib/vue-sortable.js"></script>
     <script src="js/lib/js.cookie.js"></script>
     <script src="js/lib/howler.js"></script>
     <script src="js/lib/vuex.min.js"></script>

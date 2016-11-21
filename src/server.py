@@ -19,22 +19,50 @@ from bottle import static_file, request, response
 
 from src.taglist import TagList
 from src.userdb import UserDB
-from src.validation import string_is_valid_length
 
 ROOT_PATH = os.path.realpath(os.path.join(__file__, ".."))
 VALID_SEARCH_TYPES = ("artist", "album", "title")
 
 
-def get_app_html():
+def get_app_html() -> str:
+    """
+    Returns the client interface html to the caller
+
+    :returns: A string containing the client html.
+    """
     with open(os.path.join(ROOT_PATH, "client/index.html"), "r") \
             as app_html:
         return app_html.read()
 
 
-def get_login_html():
+def get_login_html() -> str:
+    """
+    Returns the login interface html to the caller
+
+    :returns: A string containing the login html.
+    """
     with open(os.path.join(ROOT_PATH, "client/login.html"), "r") \
             as login_html:
         return login_html.read()
+
+
+def string_is_valid_length(string: str, min_len: int, max_len: int) -> bool:
+    """
+    Checks if a string falls within a specified max / min length.
+
+    :param string: The string in question.
+    :param min_len: The maximum length the string should be.
+    :param max_len: The minimum length the string should be.
+    :returns: True if the string falls within the specified range, false
+             otherwise.
+    """
+    if max_len <= min_len or min_len >= max_len:
+        raise ValueError("min_len must be less than max_len")
+
+    if string is None:
+        raise ValueError("String cannot be None")
+
+    return min_len <= len(string) <= max_len
 
 
 class Server(SessionMiddleware):
@@ -43,7 +71,7 @@ class Server(SessionMiddleware):
 
     session_opts = {
         'session.type': 'memory',
-        'session.cookie_expires': 300,
+        'session.cookie_expires': False,
         'session.auto': True
     }
 
@@ -82,8 +110,8 @@ class Server(SessionMiddleware):
         # restful API
         bottle.route("/api/search", "GET", self.__search)
         bottle.route("/api/search/", "GET", self.__search)
-        bottle.route("/api/library", "GET", self.__library)
-        bottle.route("/api/library/", "GET", self.__library)
+        bottle.route("/api/library", "GET", self._get_library)
+        bottle.route("/api/library/", "GET", self._get_library)
 
         bottle.route("/api/song/<song_path:path>", "GET", self.get_song)
 
@@ -178,19 +206,20 @@ class Server(SessionMiddleware):
         return static_file(filename, root=static_root_path)
 
     def get_song(self, song_path: str):
-        # TODO: actually verify that the song_path the user is requesting
-        # is in the database so that we don't just hand them any url
-        print(song_path)
-        return static_file(song_path, root=self.__taglist.audio_folder)
+        # log in before requesting a song
         if not self.session_is_valid():
             response.status = 403
             return
-        path_to_song = self.__taglist.get_absolute_song_path(song_path)
-        if path_to_song is None:
-            response.status = 404
-        else:
+
+        # verify the song they're requesting is a song and not a random file
+        if self.__taglist.is_song_path_in_taglist(song_path):
             response.status = 200
             return static_file(song_path, root=self.__taglist.audio_folder)
+
+        # if they ask for a path that has no song that corresponds to it
+        # then refuse
+        else:
+            response.status = "404 Couldn't find song " + song_path
 
     def __search(self):
         if self.session_is_valid():
@@ -201,8 +230,8 @@ class Server(SessionMiddleware):
         else:
             response.status = "401 Login First"
 
-    def __library(self):
+    def _get_library(self):
         if self.session_is_valid():
-            return json.dumps(self.__taglist.hierarchy)
+            return json.dumps(self.__taglist.hierarchy_song_dict)
         else:
             response.status = "401 Login First"

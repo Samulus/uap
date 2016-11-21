@@ -13,14 +13,18 @@
 #         someone could log in, wait a year, and then log back in with the
 #         same cookie if they wanted to. It's a detail but it is important.
 
+import base64
+import copy
+import os
+from os.path import realpath, join
+
+import scrypt
 from tinydb import TinyDB, Query
 from tinydb.storages import MemoryStorage
-from os.path import realpath, join
-from crypt import mksalt
-from crypt import METHOD_SHA512
-import copy
-import scrypt
-import base64
+
+
+def random_salt():
+    return base64.encodebytes(os.urandom(24)).decode("utf8")
 
 
 class UserDB:
@@ -63,8 +67,8 @@ class UserDB:
         # copy the schema, create the new user, insert them into database
         new_user = copy.deepcopy(UserDB.USER_SCHEMA)
         new_user['username'] = username
-        new_user['salt'] = mksalt(METHOD_SHA512)
-        new_user['session_id'] = mksalt(METHOD_SHA512)
+        new_user['salt'] = random_salt()
+        new_user['session_id'] = random_salt()
 
         # create a bs64 string by hashing their password and salt
         # and encoding this as bs64, then store it in the db
@@ -84,9 +88,9 @@ class UserDB:
 
         # change the user's password and reset their session_id
         # they will have to log back in
-        new_salt = mksalt(METHOD_SHA512)
+        new_salt = random_salt()
         new_password = UserDB.__create_password(password, new_salt)
-        new_session_id = mksalt(METHOD_SHA512)
+        new_session_id = random_salt()
         self.__database.update({'session_id': new_session_id,
                                 'password': new_password,
                                 'salt': new_salt},
@@ -102,7 +106,7 @@ class UserDB:
         # reset their session id so their new requests become invalid
         # this forces them to log back in
         self.__database.update(
-            {'session_id': mksalt(METHOD_SHA512)})
+            {'session_id': random_salt()})
 
     def log_user_in(self, username: str, password_to_verify: str) -> bool:
         # can't login if you don't exist
@@ -117,7 +121,7 @@ class UserDB:
 
         # generate a new session_id on log in
         if password_to_verify == known_good_password:
-            self.__database.update({'session_id': mksalt(METHOD_SHA512)},
+            self.__database.update({'session_id': random_salt()},
                                    eids=[user.eid])
             return True
 
@@ -157,17 +161,17 @@ class UserDB:
 
         # get their ID and then give them a new session id
         eid = results[0].eid
-        self.__database.update({"session_id": mksalt(METHOD_SHA512)},
+        self.__database.update({"session_id": random_salt()},
                                eids=[eid])
 
     @staticmethod
     def __create_password(password=None, salt=None) -> str:
         if password is None or salt is None:
-            raise ValueError("Password and Salt cannot be none.")
+            raise ValueError("Password or Salt cannot be none.")
         return base64.encodebytes(scrypt.hash(password, salt)).decode('utf-8')
 
     @staticmethod
     def __decode_password(password=None, salt=None):
         if password is None or salt is None:
-            raise ValueError("Password and Salt cannot be none.")
+            raise ValueError("Password or Salt cannot be none.")
         return base64.decodebytes(password.encode('utf-8'))
