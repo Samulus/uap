@@ -12,4 +12,3 @@ def string_is_valid_length(string: str, min_len=8, max_len=512) -> bool:
     if string is None:
         raise ValueError("String cannot be None")
     return min_len <= len(string) <= max_len
-
