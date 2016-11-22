@@ -15,7 +15,6 @@
 
 import base64
 import copy
-import os
 from os.path import realpath, join
 
 import bcrypt
@@ -24,7 +23,7 @@ from tinydb.storages import MemoryStorage
 
 
 def random_salt():
-    return base64.encodebytes(os.urandom(24)).decode("utf8")
+    return bcrypt.gensalt()
 
 
 class UserDB:
@@ -115,7 +114,9 @@ class UserDB:
             return False
 
         # determine if their password is correct
-        password_to_verify = bcrypt.hashpw(password_to_verify, user['salt'])
+        password_to_verify = bcrypt.hashpw(password_to_verify.encode("utf-8"),
+                                           user['salt'])
+
         known_good_password = UserDB.__decode_password(user['password'],
                                                        user['salt'])
 
@@ -168,7 +169,8 @@ class UserDB:
     def __create_password(password=None, salt=None) -> str:
         if password is None or salt is None:
             raise ValueError("Password or Salt cannot be none.")
-        return base64.encodebytes(bcrypt.hashpw(password, salt)).decode('utf-8')
+        return base64.encodebytes(bcrypt.hashpw(password.encode("utf-8"),
+                                                salt)).decode('utf-8')
 
     @staticmethod
     def __decode_password(password=None, salt=None):
