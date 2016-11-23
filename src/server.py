@@ -105,6 +105,7 @@ class Server(SessionMiddleware):
         bottle.route("/<filename:re:.*\.js>", "GET", self.__static_file)
         bottle.route("/<filename:re:.*\.min.map>", "GET", self.__static_file)
         bottle.route("/<filename:re:.*\.woff>", "GET", self.__static_file)
+        bottle.route("/<filename:re:.*\.woff2.*>", "GET", self.__static_file)
         bottle.route("/<filename:re:.*\.ttf>", "GET", self.__static_file)
 
         # restful API
