@@ -38,7 +38,7 @@
 
 # Misc Frontend Information
 
-* Please execute tests/mock_server.py and point your web browser
+* Please execute src/mocks/mock_server.py and point your web browser
 to http://127.0.0.1:8080 to preview and work on the client 
 
 * If you attempt to open index.html and download data
