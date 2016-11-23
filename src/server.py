@@ -109,8 +109,8 @@ class Server(SessionMiddleware):
         bottle.route("/<filename:re:.*\.ttf>", "GET", self.__static_file)
 
         # restful API
-        bottle.route("/api/search", "GET", self.__search)
-        bottle.route("/api/search/", "GET", self.__search)
+        bottle.route("/api/search", "GET", self._search)
+        bottle.route("/api/search/", "GET", self._search)
         bottle.route("/api/library", "GET", self._get_library)
         bottle.route("/api/library/", "GET", self._get_library)
 
@@ -222,7 +222,7 @@ class Server(SessionMiddleware):
         else:
             response.status = "404 Couldn't find song " + song_path
 
-    def __search(self):
+    def _search(self):
         if self.session_is_valid():
             artist = request.query.artist or None
             album = request.query.album or None
