@@ -1,71 +1,41 @@
-/*
-    vital css overrides
-*/
-
-input:hover, input:focus, select:hover, select:focus, textarea:hover, textarea:focus {
-    border-color: #96C587;
+/* picnic overrides */
+table {
+   width: 95%;
 }
 
-/*
-    queued-song-component
-*/
-
-.song_queue_artist_name {
-    font-size: 1.3em;
+html {
+   min-width:100%;
 }
 
-.song_queue_album_name {
-    font-size: 1em;
-    margin-top:-0.5em;
-    margin-left:1em;
+.card {
+   padding: 0.4em;
+   width: 60%;
 }
 
-.song_queue_title_name {
-    font-size: 1em;
-    margin-top:-0.5em;
-    margin-left:1.5em;
-}
-
-/*
-    general application css
-*/
-
-.form-item {
-    margin-bottom:0.5em;
-}
-
-body {
-    padding: 2.5em;
-    margin-bottom: 2em;
-    width: 100%;
-}
-
-div {
-    padding-bottom: 0.3em;
-}
-
-select {
-    width: 100%;
-    margin-bottom: 1.5em;
-    overflow-y:scroll;
+.content {
+   padding-top:4em;
+   padding-left:3em;
 }
 
 center {
-  position:absolute;
-  top:40%;
-  left:50%;
-  padding:10px;
-  -ms-transform: translateX(-50%) translateY(-50%);
-  -webkit-transform: translate(-50%,-50%);
-  transform: translate(-50%,-50%);
+   position:absolute;
+   top:40%;
+   left:50%;
+   padding:10px;
+   -ms-transform: translateX(-50%) translateY(-50%);
+   -webkit-transform: translate(-50%,-50%);
+   transform: translate(-50%,-50%);
 }
 
-/* transitions */
-.fade-enter-active, .fade-leave-active {
-   transition: opacity .5s;
-  -webkit-transition: opacity .5s;
+/* 
+ * song-queue-view
+ */
+
+.important {
+   font-weight: 800;
 }
-.fade-enter, .fade-leave-active {
-  opacity: 0;
-  -webkit-opacity: 0;
+
+.seperator_keyword {
+   font-weight: 100;
+   font-size: 0.7em;
 }
