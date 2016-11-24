@@ -36,7 +36,7 @@ MOCK_TAGLIST = join(ROOT_PATH, "data/tags.json")
 def get_song(self, song_path: str):
     if self.session_is_valid():
         response.status = 200
-        return static_file("moonlight_jazz.mp3",
+        return static_file("moonlight_short.ogg",
                            root=join(ROOT_PATH, "data"))
     else:
         response.status = 403
