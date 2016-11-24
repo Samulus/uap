@@ -166,7 +166,8 @@ Vue.component('refresh-library-component', {
     }
 })
 
-Vue.component('now-playing-component', { template: "#now-playing-component" });
+Vue.component('now-playing-component', {
+    template: "#now-playing-component"});
 
 Vue.component('settings-view', {
     template: "#settings-view"
