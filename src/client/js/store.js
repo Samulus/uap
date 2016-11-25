@@ -17,9 +17,11 @@ var store = new Vuex.Store({
     mutations: {
         remove_track_index: function (state, i) {
             state.song_queue.splice(i, 1);
+
             /* if we remove the song that is currently playing
              * then stop the audio and reset the application playing
              * state */
+
             if (state.audio_index_playing == i) {
                 state.audio_index_playing = -1;
                 state.audio_stream_paused = false;
@@ -27,6 +29,16 @@ var store = new Vuex.Store({
                     state.audio_stream.stop();
                 state.audio_stream = null;
             }
+
+           /* if removing an element less than
+            * the current audio element that is playing
+            * then decrement audio_index_playing 
+            * appropriately
+            */
+
+           if (i <= state.audio_index_playing) {
+              state.audio_index_playing -= 1;
+           }
         },
 
         reorder_list: function (state, indices) {
