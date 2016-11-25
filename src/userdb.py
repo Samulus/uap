@@ -72,7 +72,7 @@ class UserDB:
         # create a bs64 string by hashing their password and salt
         # and encoding this as bs64, then store it in the db
         base64_password = UserDB.__create_password(password, new_user['salt'])
-        new_user['password'] = base64_password
+        new_user['password'] = base64_password.encode("utf-8")
         self.__database.insert(new_user)
         return True
 
@@ -176,4 +176,4 @@ class UserDB:
     def __decode_password(password=None, salt=None):
         if password is None or salt is None:
             raise ValueError("Password or Salt cannot be none.")
-        return base64.decodebytes(password.encode('utf-8'))
+        return base64.decodebytes(password)
