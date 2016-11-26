@@ -45,12 +45,18 @@ var store = new Vuex.Store({
             var deleted = state.song_queue.splice(indices.old, 1);
             state.song_queue.splice(indices.new, 0, deleted[0]);
 
-            /* if we drag a song that is not playing to where
-             * the currently playing song is then we have to
+            /* if we drag a song that IS NOT  playing to where
+             * the currently playing song is then we either
+             * have to move the now playing song either
+             * -1 or +1 depending on where we are
              */
 
             if (indices.new == state.audio_index_playing) {
-                state.audio_index_playing = indices.old;
+                if (indices.old < indices.new) {
+                  state.audio_index_playing -= 1;
+                } else {
+                  state.audio_index_playing += 1;
+                }
             }
 
             /* if we're dragging a song that IS currently playing
