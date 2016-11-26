@@ -88,8 +88,6 @@ class Server(SessionMiddleware):
         self.__reloader = reloader
         self.__debug = debug
 
-        print(signup_allowed)
-
         # insert or remove "sign up" button from html
         # if signups are allowed or not
         Server.LOGIN_HTML = template(get_login_html(),
