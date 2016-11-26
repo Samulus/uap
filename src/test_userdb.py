@@ -76,6 +76,8 @@ class UserDBTest(unittest.TestCase):
         db = userdb.UserDB(sys.path[0]+"\\tests", True)
         db.add_user("user123", "password123")
         db.log_user_in("user123", "password123")
+        id = db.get_user_session_id("user123")
+        db.create_new_user_session(id)
 
         # Log out someone who doesn't exist
         try:
