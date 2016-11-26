@@ -17,7 +17,9 @@
                   <input placeholder="Username" type="text" v-model="username">
                   <input placeholder="Password" type="password" v-model="password">
                         <button class="success" v-on:click="action('login', $event)">Login</button>
+                        % if signup_allowed: 
                         <button class=""  v-on:click="action('signup', $event)">Signup</></button>
+                        % end
                         <transition name="fade">
                             <div class="row notice" v-if="got_message_from_server">{{message}}</div>
                         </transition>

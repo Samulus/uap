@@ -15,7 +15,7 @@ import os
 
 import bottle
 from beaker.middleware import SessionMiddleware
-from bottle import static_file, request, response
+from bottle import static_file, request, response, template
 
 from src.taglist import TagList
 from src.userdb import UserDB
@@ -67,7 +67,7 @@ def string_is_valid_length(string: str, min_len: int, max_len: int) -> bool:
 
 class Server(SessionMiddleware):
     APP_HTML = get_app_html()
-    LOGIN_HTML = get_login_html()
+    LOGIN_HTML = None
 
     session_opts = {
         'session.type': 'memory',
@@ -76,15 +76,25 @@ class Server(SessionMiddleware):
     }
 
     def __init__(self, userdb: UserDB, taglist: TagList, host='127.0.0.1',
-                 port=8080, login_required=True, reloader=False, debug=False):
+                 port=8080, login_required=True, signup_allowed=True,
+                 reloader=False, debug=False):
         super(Server, self).__init__(bottle.app(), Server.session_opts)
         self.__userdb = userdb
         self.__login_required = login_required
+        self.__signup_allowed = signup_allowed
         self.__taglist = taglist
         self.__port = port
         self.__host = host
         self.__reloader = reloader
         self.__debug = debug
+
+        print(signup_allowed)
+
+        # insert or remove "sign up" button from html
+        # if signups are allowed or not
+        Server.LOGIN_HTML = template(get_login_html(),
+               signup_allowed=self.__signup_allowed,
+               message="{{message}}")
 
         # serve main index / application
         bottle.route("/", "GET", self.__index)
@@ -153,6 +163,10 @@ class Server(SessionMiddleware):
             session['session_id'] = self.__userdb.get_user_session_id(username)
 
     def __sign_up(self):
+        if not self.__signup_allowed:
+            response.status = '403 New signups have been disabled'
+            return
+
         # TODO: input sanitation
         username = request.forms.get('username') or None
         password = request.forms.get('password') or None
@@ -200,7 +214,9 @@ class Server(SessionMiddleware):
             if not self.__debug:
                 return Server.LOGIN_HTML
             else:
-                return get_login_html()
+                return template(get_login_html(),
+                       signup_allowed=self.__signup_allowed,
+                       message="{{message}}")
 
     def __static_file(self, filename: str):
         static_root_path = os.path.join(ROOT_PATH, "client/")

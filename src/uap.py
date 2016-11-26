@@ -25,6 +25,7 @@ if __name__ == '__main__':
         debug=settings['debug'],
         reloader=settings['reloader'],
         login_required=settings['login_required'],
+        signup_allowed=settings['signup_allowed'],
     )
 
     server.start()

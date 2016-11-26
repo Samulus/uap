@@ -8,7 +8,8 @@ DEFAULT_CONFIG = {
     'port': 8080,
     'debug': False,
     'reloader': False,
-    'login_required': False,
+    'login_required': True,
+    'signup_allowed': True,
     'music_folder': None,
 }
 
@@ -19,6 +20,7 @@ port = 8080
 debug = False
 reloader = False
 login_required = True
+signup_allowed = True
 #music_folder = uncomment this, put your music folder here
 """
 
@@ -58,7 +60,7 @@ def load_settings_dict():
         if key in config['settings'] else DEFAULT_CONFIG[key]
 
     # boolean values
-    for key in ("debug", "reloader", "login_required"):
+    for key in ("debug", "reloader", "login_required", "signup_allowed"):
         settings[key] = config.getboolean('settings', key) \
             if key in config['settings'] else DEFAULT_CONFIG[key]
 
