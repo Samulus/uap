@@ -1,7 +1,7 @@
 /*
- login.js
- Author: Samuel Vargas
- Date: 11/14/2016
+   login.js
+   Author: Samuel Vargas
+   Date: 11/14/2016
  */
 
 Vue.http.options.emulateJSON = true;
@@ -19,7 +19,7 @@ var login_vm = new Vue({
     methods: {
         action: function (action_type, event) {
             event.preventDefault();
-            Vue.http.post('api/' + action_type, {
+            this.$http.post('api/' + action_type, {
                 'username': this.$data.username,
                 'password': sha512(this.$data.password),
             }).then(
@@ -27,10 +27,10 @@ var login_vm = new Vue({
                     location.reload();
                 },
                 function failure(response) {
-                    login_vm.$data.got_message_from_server = true;
-                    login_vm.$data.message = response.statusText;
+                    this.$data.got_message_from_server = true;
+                    this.$data.message = response.statusText;
                     setTimeout(function () {
-                        login_vm.$data.got_message_from_server = false;
+                        this.$data.got_message_from_server = false;
                     }, 3000);
                 }
             );
