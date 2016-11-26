@@ -173,7 +173,7 @@ class UserDB:
                                                 salt)).decode('utf-8')
 
     @staticmethod
-    def __decode_password(password=None, salt=None):
-        if password is None or salt is None:
+    def __decode_password(password: str = None):
+        if password is None:
             raise ValueError("Password or Salt cannot be none.")
         return base64.decodebytes(password)
