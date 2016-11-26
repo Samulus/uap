@@ -35,7 +35,7 @@ var login_vm = new Vue({
                 }
             );
         },
-        sha512: {
+        sha512: function(sha512){
             password = sha512(password);
         }
     }
