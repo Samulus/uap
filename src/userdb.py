@@ -23,7 +23,7 @@ from tinydb.storages import MemoryStorage
 
 
 def random_salt():
-    return bcrypt.gensalt()
+    return bcrypt.gensalt().decode("utf-8")
 
 
 class UserDB:
@@ -72,7 +72,7 @@ class UserDB:
         # create a bs64 string by hashing their password and salt
         # and encoding this as bs64, then store it in the db
         base64_password = UserDB.__create_password(password, new_user['salt'])
-        new_user['password'] = base64_password.encode("utf-8")
+        new_user['password'] = base64_password.decode("utf-8")
         self.__database.insert(new_user)
         return True
 
@@ -115,10 +115,10 @@ class UserDB:
 
         # determine if their password is correct
         password_to_verify = bcrypt.hashpw(password_to_verify.encode("utf-8"),
-                                           user['salt'])
+                                           user['salt'].encode("utf-8"))
 
-        known_good_password = UserDB.__decode_password(user['password'],
-                                                       user['salt'])
+        known_good_password = UserDB.__decode_password(
+                user['password'].encode("utf-8"))
 
         # generate a new session_id on log in
         if password_to_verify == known_good_password:
@@ -170,7 +170,7 @@ class UserDB:
         if password is None or salt is None:
             raise ValueError("Password or Salt cannot be none.")
         return base64.encodebytes(bcrypt.hashpw(password.encode("utf-8"),
-                                                salt)).decode('utf-8')
+                                                salt.encode("utf-8")))
 
     @staticmethod
     def __decode_password(password: str = None):
