@@ -5,6 +5,7 @@
  */
 
 Vue.http.options.emulateJSON = true;
+
 var login_vm = new Vue({
     template: "#login-component",
     el: "#login",
@@ -33,6 +34,9 @@ var login_vm = new Vue({
                     }, 3000);
                 }
             );
+        },
+        sha512: function(sha512){
+            password = sha512(password);
         }
     }
 
