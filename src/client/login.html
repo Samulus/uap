@@ -2,33 +2,28 @@
 <html lang="en" xmlns:v-on="http://www.w3.org/1999/xhtml">
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scaleable=no">
         <title>uap</title>
-        <link rel="stylesheet" href="css/vital.min.css">
+        <link rel="stylesheet" href="css/picnic.min.css">
+        <link rel="stylesheet" href="css/font-awesome-4.7.0/css/font-awesome.min.css">
         <link rel="stylesheet" href="css/layout.css">
     </head>
 
     <body>
         <center>
-
             <h1>Login</h1>
-
             <template id="login-component">
-                <div class="full-width-forms">
-                    <input placeholder="Username" type="text" class="form-item" v-model="username">
-                    <input placeholder="Password" type="password" class="form-item" v-model="password">
-                    <div class="autogrid">
-                        <a href="/" class="col 1-2 form-item btn green" v-on:click="action('login', $event)">Login</a>
-                        <a href="/" class="col 1-2 form-item btn blue"  v-on:click="action('signup', $event)">Signup</a>
+               <div>
+                  <input placeholder="Username" type="text" v-model="username">
+                  <input placeholder="Password" type="password" v-model="password">
+                        <button class="success" v-on:click="action('login', $event)">Login</button>
+                        <button class=""  v-on:click="action('signup', $event)">Signup</></button>
                         <transition name="fade">
                             <div class="row notice" v-if="got_message_from_server">{{message}}</div>
                         </transition>
-                    </div>
-                </div>
+               </div>
             </template>
-
             <div id="login"></div>
-
         </center>
     </body>
 
