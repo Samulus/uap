@@ -21,7 +21,7 @@ var login_vm = new Vue({
             event.preventDefault();
             Vue.http.post('api/' + action_type, {
                 'username': this.$data.username,
-                'password': this.$data.password,
+                'password': sha512(this.$data.password),
             }).then(
                 function success(response) {
                     location.reload();
@@ -35,9 +35,6 @@ var login_vm = new Vue({
                 }
             );
         },
-        sha512: function(sha512){
-            password = sha512(password);
-        }
     }
 
 });
