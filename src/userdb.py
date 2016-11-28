@@ -104,8 +104,7 @@ class UserDB:
 
         # reset their session id so their new requests become invalid
         # this forces them to log back in
-        self.__database.update(
-            {'session_id': random_salt()})
+        self.__database.update( {'session_id': random_salt()}, eids=[user.eid])
 
     def log_user_in(self, username: str, password_to_verify: str) -> bool:
         # can't login if you don't exist
