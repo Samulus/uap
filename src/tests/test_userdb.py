@@ -1,7 +1,7 @@
 #
 #   test_userdb.py
-#   Author: Samuel Vargas
-#   Date: 11/09/2016
+#   Author: Steve Campbell
+#   Date: 11/28/2016
 #
 #   This module is responsible for testing the userdb.py module
 #   for bugs, security issues, and ease of use. It should ensure that
