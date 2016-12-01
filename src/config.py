@@ -6,22 +6,35 @@ CONFIG_PATH = realpath(join(__file__, "..", "config.ini"))
 DEFAULT_CONFIG = {
     'host': '127.0.0.1',
     'port': 8080,
-    'debug': False,
-    'reloader': False,
+    'music_folder': None,
     'login_required': True,
     'signup_allowed': True,
-    'music_folder': None,
+    'debug': False,
+    'reloader': False,
 }
 
 EXAMPLE_INI = """
 [settings]
+# ip address and port to listen on
 host = 127.0.0.1
 port = 8080
-debug = False
-reloader = False
+
+# put the absolute path to your music folder
+# here, i.e. C:\\Users\Sam\music or
+# /home/sam/music
+music_folder =
+
+# require the user to authenticate before they can
+# login to the server
 login_required = True
+
+# disable the ability for new people to register (only
+# existing users can connect)
 signup_allowed = True
-#music_folder = uncomment this, put your music folder here
+
+# leave this as false unless you're a uap dev :-)
+#debug = False
+#reloader = False
 """
 
 
