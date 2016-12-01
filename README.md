@@ -2,7 +2,8 @@
 an audio webserver for streaming music / using as a jukebox
 
 # preview
-[demo]: media/demo.png "Demo"
+![](/media/demo.jpg)
+
 
 # about
 uap (Untitled Audio Project) is a portable cross platform 
