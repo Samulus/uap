@@ -73,7 +73,8 @@ if __name__ == '__main__':
             taglist=TagList(tempfile.gettempdir()),
             userdb=UserDB(ram_db=True),
             debug=True,
-            login_required=True,
+            login_required=False,
+            signup_allowed=False,
             reloader=False
         )
         server.start()
