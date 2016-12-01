@@ -1,5 +1,5 @@
 # Project Dependencies
-* python3
+* [python3](https://www.python.org/download/releases/3.0/)
     * ...
 * [mutagen](https://pypi.python.org/pypi/mutagen)
     * For reading tags from audio files
@@ -10,7 +10,7 @@
 * [bcrypt](https://pypi.python.org/pypi/bcrypt/2.0.0)
     * For hashing client passwords serverside for security purposes.
 * [tinydb](http://tinydb.readthedocs.io/en/latest/)
-        * For saving information about users, sessions, and the music library
+    * For saving information about users, sessions, and the music library
 
 # Useful Documentation Shortcuts
 
