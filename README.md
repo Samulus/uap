@@ -23,6 +23,8 @@ projects like [Zeya](http://web.psung.name/zeya/) and
    * Closed signups
    * Public mode (no accounts required)
 * Clean hackable code base.
+   * Unittests 
+   * Mock modules
 
 # installation guide
 
