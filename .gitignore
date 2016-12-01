@@ -83,3 +83,7 @@ config.ini
 /src/database/users.json
 /src/database/session.json
 /src/database/taglist.json
+
+# cpi310 specific stuff
+uap.mkv
+presentation.pptx
